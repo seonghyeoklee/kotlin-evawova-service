@@ -1,0 +1,22 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  config:
+    import:
+      - 'classpath:adapter-persistence-property.yml'
+      - 'classpath:adapter-redis-property.yml'
+  application:
+    name: evawova-app-api
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: always

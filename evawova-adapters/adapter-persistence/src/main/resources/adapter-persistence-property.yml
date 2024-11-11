@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    hikari:
+      jdbc-url: jdbc:mysql://evawova-mysql:3306/evawova
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: root
+      password: 1234
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create
+    generate-ddl: false
+    open-in-view: false
+    show-sql: true
