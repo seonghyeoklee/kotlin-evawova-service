@@ -17,6 +17,7 @@ class AdminUserEntity(
     role: String,
     status: String,
 ) {
+    @Comment("PK")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0

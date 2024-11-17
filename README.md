@@ -8,7 +8,8 @@ root
 ├── evawova-adapters/
 │   ├── adapter-http            # 외부와 통신을 담당하는 모듈
 │   ├── adapter-persistence     # DB 와의 통신을 담당하는 모듈
-│   └── adapter-redis           # 레디스와 통신을 담당하는 모듈
+│   ├── adapter-redis           # 레디스와 통신을 담당하는 모듈
+│   └── adapter-mongodb         # mongodb와 통신을 담당하는 모듈
 │
 ├── evawova-apps/
 │   ├── app-admin-service           # REST API 를 모아둔 모듈
