@@ -1,4 +1,4 @@
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
 }

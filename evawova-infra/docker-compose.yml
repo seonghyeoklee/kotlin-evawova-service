@@ -79,15 +79,14 @@ services:
     image: redis:7.0
     ports:
       - '6379:6379'
-  evawova-app-api-1:
-    image: evawova-app-api:latest
+  evawova-app-admin-api-1:
+    image: evawova-app-admin-api:latest
     ports:
       - "8080:8080"
     depends_on:
       - evawova-mysql
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/evawova?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://evawova-mysql:3306/evawova?characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true&useUnicode=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate

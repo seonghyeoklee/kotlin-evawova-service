@@ -15,18 +15,10 @@ dependencies {
     runtimeOnly(project(":evawova-adapters:adapter-http"))
     runtimeOnly(project(":evawova-adapters:adapter-persistence"))
     runtimeOnly(project(":evawova-adapters:adapter-redis"))
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
-    testImplementation("io.kotest:kotest-runner-junit5:5.6.2")
-    testImplementation("io.kotest:kotest-assertions-core:5.6.2")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
 }
 
 val appMainClassName = "com.evawova.EvawovaApiApplicationKt"
-tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+tasks.getByName<BootJar>("bootJar") {
     mainClass.set(appMainClassName)
     archiveClassifier.set("boot")
 }
@@ -34,6 +26,12 @@ tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar
 tasks.register("dockerBuild") {
     group = "docker"
     description = "Builds a Docker image for the application."
+
+    dependsOn(
+        subprojects.flatMap { project ->
+            listOf("${project.path}:clean", "${project.path}:build")
+        },
+    )
 
     dependsOn(tasks.getByName("bootJar"))
 
@@ -43,7 +41,7 @@ tasks.register("dockerBuild") {
                 "docker",
                 "build",
                 "-t",
-                "evawova-app-api:latest",
+                "evawova-app-admin-api:latest",
                 ".",
             )
         }
