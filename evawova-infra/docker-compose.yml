@@ -8,6 +8,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 32181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - evawova-network
   evawova-kafka-1:
     image: confluentinc/cp-kafka:7.2.6
     ports:
@@ -22,6 +24,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://evawova-kafka-1:29092,EXTERNAL://localhost:9092
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
+    networks:
+      - evawova-network
   evawova-kafka-2:
     image: confluentinc/cp-kafka:7.2.6
     ports:
@@ -36,6 +40,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://evawova-kafka-2:29093,EXTERNAL://localhost:9093
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
+    networks:
+      - evawova-network
   evawova-kafka-3:
     image: confluentinc/cp-kafka:7.2.6
     ports:
@@ -50,6 +56,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://evawova-kafka-3:29094,EXTERNAL://localhost:9094
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
+    networks:
+      - evawova-network
   evawova-kafka-ui:
     image: provectuslabs/kafka-ui
     container_name: evawova-kafka-ui
@@ -60,6 +68,8 @@ services:
       - KAFKA_CLUSTERS_0_NAME=evawova-local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=evawova-kafka-1:29092,evawova-kafka-2:29093,evawova-evawova-kafka-3:29094
       - KAFKA_CLUSTERS_0_ZOOKEEPER=evawova-zookeeper-1:22181
+    networks:
+      - evawova-network
   evawova-mysql:
     image: mysql:8.0.31
     ports:
@@ -67,6 +77,8 @@ services:
     environment:
       MYSQL_DATABASE: root
       MYSQL_ROOT_PASSWORD: 1234
+    networks:
+      - evawova-network
   evawova-mongo:
     image: mongo:6.0.5
     ports:
@@ -75,11 +87,22 @@ services:
       MONGO_INITDB_DATABASE: root
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 1234
+    networks:
+      - evawova-network
   evawova-redis:
     image: redis:7.0
     ports:
       - '6379:6379'
-  evawova-app-admin-service-1:
+    networks:
+      - evawova-network
+  evawova-app-eureka-server:
+    image: evawova-app-eureka-service:latest
+    ports:
+      - '8761:8761'
+    restart: always
+    networks:
+      - evawova-network
+  evawova-app-admin-service:
     image: evawova-app-admin-service:latest
     ports:
       - "8080:8080"
@@ -90,3 +113,24 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
+    networks:
+      - evawova-network
+  evawova-app-logger-service:
+    image: evawova-app-logger-service:latest
+    ports:
+      - "8081:8080"
+    depends_on:
+      - evawova-mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://evawova-mysql:3306/evawova?characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true&useUnicode=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
+    networks:
+      - evawova-network
+
+networks:
+  evawova-network:
+    driver: bridge

@@ -2,10 +2,12 @@ package com.evawova
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer
 
+@EnableEurekaServer
 @SpringBootApplication
-class EvawovaApiApplication
+class EurekaServiceApplication
 
 fun main(args: Array<String>) {
-    runApplication<EvawovaApiApplication>(*args)
+    runApplication<EurekaServiceApplication>(*args)
 }

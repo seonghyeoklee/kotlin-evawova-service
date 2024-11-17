@@ -1,0 +1,24 @@
+server:
+  port: 8761
+  shutdown: graceful
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://evawova-infra-evawova-app-eureka-server-1:8761/eureka/
+    register-with-eureka: false
+    fetch-registry: false
+    registry-fetch-interval-seconds: 5
+    disable-delta: true
+  server:
+    response-cache-update-interval-ms: 5000
+    enable-self-preservation: false
+    renewal-threshold-update-interval-ms: 900000
+    renewal-percent-threshold: 0.85
+    eviction-interval-timer-in-ms: 60000
+
+spring:
+  application:
+    name: evawova-app-eureka-service

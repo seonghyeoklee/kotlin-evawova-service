@@ -56,6 +56,7 @@ configureByLabels("kotlin") {
     the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
         imports {
             mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.5")
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.3")
             mavenBom("com.google.guava:guava-bom:31.1-jre")
         }
 

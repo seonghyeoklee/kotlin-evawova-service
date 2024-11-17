@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
   shutdown: graceful
 
 spring:
@@ -8,7 +8,7 @@ spring:
       - 'classpath:adapter-persistence-property.yml'
       - 'classpath:adapter-redis-property.yml'
   application:
-    name: evawova-app-admin-service
+    name: evawova-app-logger-service
 
 management:
   endpoints:
