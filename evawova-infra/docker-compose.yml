@@ -79,8 +79,8 @@ services:
     image: redis:7.0
     ports:
       - '6379:6379'
-  evawova-app-admin-api-1:
-    image: evawova-app-admin-api:latest
+  evawova-app-admin-service-1:
+    image: evawova-app-admin-service:latest
     ports:
       - "8080:8080"
     depends_on:

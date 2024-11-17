@@ -4,6 +4,6 @@ RUN apt-get update && apt-get install -y openjdk-17-jdk && apt-get clean;
 
 WORKDIR /app
 
-COPY build/libs/app-admin-api-boot.jar /app/
+COPY build/libs/app-admin-service-boot.jar /app/
 
-CMD ["java", "-jar", "app-admin-api-boot.jar"]
+CMD ["java", "-jar", "app-admin-service-boot.jar"]

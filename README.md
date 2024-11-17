@@ -11,7 +11,7 @@ root
 │   └── adapter-redis           # 레디스와 통신을 담당하는 모듈
 │
 ├── evawova-apps/
-│   ├── app-admin-api           # REST API 를 모아둔 모듈
+│   ├── app-admin-service           # REST API 를 모아둔 모듈
 │   └── app-batch               # 배치잡을 모아둔 모듈
 │
 ├── evawova-commons/            # 공통 모듈

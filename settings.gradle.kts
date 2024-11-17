@@ -17,7 +17,7 @@ plugins {
 
 rootProject.name = "kotlin-evawova-service"
 
-include("evawova-apps:app-admin-api")
+include("evawova-apps:app-admin-service")
 include("evawova-apps:app-batch")
 
 include("evawova-adapters:adapter-http")

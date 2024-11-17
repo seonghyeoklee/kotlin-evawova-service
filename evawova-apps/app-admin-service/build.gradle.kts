@@ -41,7 +41,7 @@ tasks.register("dockerBuild") {
                 "docker",
                 "build",
                 "-t",
-                "evawova-app-admin-api:latest",
+                "evawova-app-admin-service:latest",
                 ".",
             )
         }
