@@ -14,6 +14,7 @@ dependencies {
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     runtimeOnly(project(":evawova-adapters:adapter-http"))
+    runtimeOnly(project(":evawova-adapters:adapter-mongodb"))
     runtimeOnly(project(":evawova-adapters:adapter-persistence"))
     runtimeOnly(project(":evawova-adapters:adapter-redis"))
 }

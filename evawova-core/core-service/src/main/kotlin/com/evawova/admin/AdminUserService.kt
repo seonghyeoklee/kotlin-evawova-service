@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service
 @Service
 class AdminUserService(
     private val createAdminUserPort: CreateAdminUserPort,
-) : AdminUserRegisterUseCase {
+    private val readAdminUserPort: ReadAdminUserPort,
+) : AdminUserRegisterUseCase,
+    AdminUserFetchUseCase {
     override fun registerAdminUser(command: AdminUserRegisterCommand): AdminUserResponse {
         val portalUser =
             createAdminUserPort.createAdminUser(
@@ -23,6 +25,18 @@ class AdminUserService(
             name = portalUser.name,
             role = portalUser.role,
             status = portalUser.status,
+        )
+    }
+
+    override fun fetchAdminUser(): AdminUserResponse {
+        val adminUser = readAdminUserPort.readAdminUser()
+
+        return AdminUserResponse(
+            id = adminUser.id,
+            email = adminUser.email,
+            name = adminUser.name,
+            role = adminUser.role,
+            status = adminUser.status,
         )
     }
 }
