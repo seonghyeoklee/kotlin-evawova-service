@@ -26,6 +26,6 @@ class AdminUserRepository(
 
         return adminUserJpaRepository
             .save(adminUserEntity)
-            .let { AdminUser(it.id, it.email, it.name, it.role, it.status) }
+            .let { AdminUser(it.id!!, it.email, it.name, it.role, it.status) }
     }
 }
