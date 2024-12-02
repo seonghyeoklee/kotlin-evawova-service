@@ -3,7 +3,6 @@ dependencies {
     implementation(project(":evawova-core:core-domain"))
     implementation(project(":evawova-commons"))
 
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-
-    runtimeOnly(project(":evawova-core:core-service"))
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.kafka:spring-kafka")
 }

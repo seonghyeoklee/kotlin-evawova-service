@@ -1,0 +1,10 @@
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: evawova-kafka-1:29092,evawova-kafka-2:29093,evawova-kafka-3:29094
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: my-consumer-group

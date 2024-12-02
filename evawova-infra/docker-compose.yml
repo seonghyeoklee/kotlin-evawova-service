@@ -116,20 +116,6 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
     networks:
       - evawova-network
-  evawova-app-logger-service:
-    image: evawova-app-logger-service:latest
-    ports:
-      - "8081:8080"
-    depends_on:
-      - evawova-mysql
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://evawova-mysql:3306/evawova?characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true&useUnicode=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234
-      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
-    networks:
-      - evawova-network
 
 networks:
   evawova-network:
