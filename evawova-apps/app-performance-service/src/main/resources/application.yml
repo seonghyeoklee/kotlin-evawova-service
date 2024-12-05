@@ -10,7 +10,7 @@ spring:
       - 'classpath:adapter-persistence-property.yml'
       - 'classpath:adapter-redis-property.yml'
   application:
-    name: evawova-app-admin-service
+    name: evawova-app-performance-service
 
 management:
   endpoints:

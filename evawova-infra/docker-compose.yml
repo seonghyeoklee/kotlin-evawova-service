@@ -117,6 +117,45 @@ services:
     networks:
       - evawova-network
 
+  evawova-app-performance-service:
+    image: evawova-app-performance-service:latest
+    ports:
+      - "8081:8080"
+    depends_on:
+      - evawova-mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://evawova-mysql:3306/evawova?characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true&useUnicode=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
+    networks:
+      - evawova-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: evawova-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - evawova-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: evawova-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - evawova-network
 networks:
   evawova-network:
     driver: bridge
