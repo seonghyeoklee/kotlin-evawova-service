@@ -114,6 +114,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
+      - LOG_DIR=/app/logs
     networks:
       - evawova-network
 
@@ -129,22 +130,23 @@ services:
       - SPRING_DATASOURCE_PASSWORD=1234
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
+      - LOG_DIR=/app/logs
     networks:
       - evawova-network
 
-  prometheus:
+  evawova-prometheus:
     image: prom/prometheus:latest
     container_name: evawova-prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
     networks:
       - evawova-network
 
-  grafana:
+  evawova-grafana:
     image: grafana/grafana:latest
     container_name: evawova-grafana
     ports:
@@ -153,9 +155,28 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
-      - prometheus
+      - evawova-prometheus
     networks:
       - evawova-network
+
+  evawova-loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    networks:
+      - evawova-network
+
+  evawova-promtail:
+    image: grafana/promtail:2.8.2
+    volumes:
+      - ./promtail:/etc/promtail
+      - ./logs:/logs
+    command: -config.file=/etc/promtail/promtail-config.yml
+    depends_on:
+      - evawova-loki
+    networks:
+      - evawova-network
+
 networks:
   evawova-network:
     driver: bridge

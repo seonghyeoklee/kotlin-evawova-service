@@ -1,0 +1,26 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://host.docker.internal:3100/loki/api/v1/push
+
+target_config:
+  sync_period: 10s
+
+scrape_configs:
+  - job_name: logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: evawova-app-admin-service
+          application: admin-service
+          env: local
+          __path__: /logs/**/**.log
+    relabel_configs:
+      - source_labels: ["__address__"]
+        target_label: address

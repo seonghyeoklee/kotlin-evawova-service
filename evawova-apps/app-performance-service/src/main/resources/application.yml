@@ -24,6 +24,9 @@ management:
     metrics:
       export:
         enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 eureka:
   instance:
@@ -35,3 +38,8 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     registry-fetch-interval-seconds: 10
+
+logging:
+  config: classpath:logback-spring.xml
+  file:
+    path: ./evawova-infra/logs
