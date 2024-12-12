@@ -1,15 +1,14 @@
 package com.evawova.controller
 
-import com.evawova.repository.admin.AdminUserRepository
-import org.springframework.web.bind.annotation.PostMapping
+import com.evawova.entity.Product
+import com.evawova.service.ProductService
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class PerformanceTestController(
-    private val userRepository: AdminUserRepository,
+    private val productService: ProductService,
 ) {
-    @PostMapping("/insert")
-    fun insert() {
-        // Insert performance test
-    }
+    @GetMapping("/products")
+    fun insert(): Product = productService.getProductById(100)
 }

@@ -20,7 +20,7 @@ scrape_configs:
           job: evawova-app-admin-service
           application: admin-service
           env: local
-          __path__: /logs/**/**.log
+          __path__: ./logs/**/**.log
     relabel_configs:
       - source_labels: ["__address__"]
         target_label: address

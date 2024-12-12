@@ -121,7 +121,7 @@ services:
   evawova-app-performance-service:
     image: evawova-app-performance-service:latest
     ports:
-      - "8081:8080"
+      - "8081:8081"
     depends_on:
       - evawova-mysql
     environment:

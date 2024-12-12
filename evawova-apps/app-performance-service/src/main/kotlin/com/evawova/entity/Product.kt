@@ -1,6 +1,7 @@
 package com.evawova.entity
 
 import jakarta.persistence.*
+import java.io.Serializable
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -26,4 +27,4 @@ data class Product(
     val description: String,
     @Column(nullable = false)
     val status: String,
-)
+) : Serializable
