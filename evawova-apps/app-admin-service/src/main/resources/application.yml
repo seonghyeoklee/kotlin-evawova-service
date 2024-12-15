@@ -40,6 +40,5 @@ eureka:
     registry-fetch-interval-seconds: 10
 
 logging:
-  config: classpath:logback-spring.xml
   file:
     path: ./evawova-infra/logs

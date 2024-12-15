@@ -13,11 +13,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
-    runtimeOnly(project(":evawova-adapters:adapter-http"))
-    runtimeOnly(project(":evawova-adapters:adapter-kafka"))
-    runtimeOnly(project(":evawova-adapters:adapter-mongodb"))
-    runtimeOnly(project(":evawova-adapters:adapter-persistence"))
-    runtimeOnly(project(":evawova-adapters:adapter-redis"))
+    implementation(project(":evawova-adapters:adapter-http"))
+    implementation(project(":evawova-adapters:adapter-kafka"))
+    implementation(project(":evawova-adapters:adapter-mongodb"))
+    implementation(project(":evawova-adapters:adapter-persistence"))
+    implementation(project(":evawova-adapters:adapter-redis"))
 }
 
 val appMainClassName = "com.evawova.AdminServiceApplicationKt"

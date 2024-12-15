@@ -3,17 +3,22 @@ version: '3.8'
 services:
   evawova-zookeeper-1:
     image: confluentinc/cp-zookeeper:7.2.6
+    container_name: evawova-zookeeper-1
     ports:
       - '32181:32181'
+    restart: always
     environment:
       ZOOKEEPER_CLIENT_PORT: 32181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
       - evawova-network
+
   evawova-kafka-1:
     image: confluentinc/cp-kafka:7.2.6
+    container_name: evawova-kafka-1
     ports:
       - '9092:9092'
+    restart: always
     depends_on:
       - evawova-zookeeper-1
     environment:
@@ -26,10 +31,13 @@ services:
       KAFKA_NUM_PARTITIONS: 3
     networks:
       - evawova-network
+
   evawova-kafka-2:
     image: confluentinc/cp-kafka:7.2.6
+    container_name: evawova-kafka-2
     ports:
       - '9093:9093'
+    restart: always
     depends_on:
       - evawova-zookeeper-1
     environment:
@@ -42,10 +50,13 @@ services:
       KAFKA_NUM_PARTITIONS: 3
     networks:
       - evawova-network
+
   evawova-kafka-3:
     image: confluentinc/cp-kafka:7.2.6
+    container_name: evawova-kafka-3
     ports:
       - '9094:9094'
+    restart: always
     depends_on:
       - evawova-zookeeper-1
     environment:
@@ -58,6 +69,7 @@ services:
       KAFKA_NUM_PARTITIONS: 3
     networks:
       - evawova-network
+
   evawova-kafka-ui:
     image: provectuslabs/kafka-ui
     container_name: evawova-kafka-ui
@@ -70,67 +82,38 @@ services:
       - KAFKA_CLUSTERS_0_ZOOKEEPER=evawova-zookeeper-1:22181
     networks:
       - evawova-network
+
   evawova-mysql:
     image: mysql:8.0.31
+    container_name: evawova-mysql
     ports:
       - '3306:3306'
-    environment:
-      MYSQL_DATABASE: root
-      MYSQL_ROOT_PASSWORD: 1234
-    networks:
-      - evawova-network
-  evawova-mongo:
-    image: mongo:6.0.5
-    ports:
-      - '27017:27017'
-    environment:
-      MONGO_INITDB_DATABASE: root
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: 1234
-    networks:
-      - evawova-network
-  evawova-redis:
-    image: redis:7.0
-    ports:
-      - '6379:6379'
-    networks:
-      - evawova-network
-  evawova-app-eureka-server:
-    image: evawova-app-eureka-service:latest
-    ports:
-      - '8761:8761'
     restart: always
-    networks:
-      - evawova-network
-  evawova-app-admin-service:
-    image: evawova-app-admin-service:latest
-    ports:
-      - "8080:8080"
-    depends_on:
-      - evawova-mysql
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://evawova-mysql:3306/evawova?characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true&useUnicode=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234
-      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
-      - LOG_DIR=/app/logs
+      MYSQL_DATABASE: ${MYSQL_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
     networks:
       - evawova-network
 
-  evawova-app-performance-service:
-    image: evawova-app-performance-service:latest
+  evawova-mongo:
+    image: mongo:6.0.5
+    container_name: evawova-mongo
     ports:
-      - "8081:8081"
-    depends_on:
-      - evawova-mysql
+      - '27017:27017'
+    restart: always
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://evawova-mysql:3306/evawova?characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true&useUnicode=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=1234
-      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
-      - LOG_DIR=/app/logs
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - evawova-network
+
+  evawova-redis:
+    image: redis:7.0
+    container_name: evawova-redis
+    ports:
+      - '6379:6379'
     networks:
       - evawova-network
 
@@ -152,8 +135,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
     depends_on:
       - evawova-prometheus
     networks:
@@ -161,6 +144,7 @@ services:
 
   evawova-loki:
     image: grafana/loki:latest
+    container_name: evawova-loki
     ports:
       - "3100:3100"
     networks:
@@ -168,12 +152,38 @@ services:
 
   evawova-promtail:
     image: grafana/promtail:2.8.2
+    container_name: evawova-promtail
     volumes:
       - ./promtail:/etc/promtail
       - ./logs:/logs
     command: -config.file=/etc/promtail/promtail-config.yml
     depends_on:
       - evawova-loki
+    networks:
+      - evawova-network
+
+  evawova-app-eureka-server:
+    image: evawova-app-eureka-service:latest
+    ports:
+      - '8761:8761'
+    restart: always
+    networks:
+      - evawova-network
+
+  evawova-app-admin-service:
+    image: evawova-app-admin-service:latest
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - evawova-mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://evawova-mysql:3306/deco?characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true&useUnicode=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQL8Dialect
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://evawova-app-eureka-server:8761/eureka/
+      - LOG_DIR=/app/logs
     networks:
       - evawova-network
 

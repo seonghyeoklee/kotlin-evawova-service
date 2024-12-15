@@ -1,6 +1,4 @@
-FROM ubuntu:20.04
-
-RUN apt-get update && apt-get install -y openjdk-17-jdk && apt-get clean;
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 

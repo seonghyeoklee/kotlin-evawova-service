@@ -35,15 +35,6 @@ configureByLabels("kotlin") {
     apply(plugin = "kotlin-kapt")
     apply(plugin = "com.palantir.docker")
 
-    configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
-
     dependencies {
         implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
@@ -70,6 +61,21 @@ configureByLabels("kotlin") {
         }
     }
 
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
+
     kotlin {
         compilerOptions {
             freeCompilerArgs.addAll("-Xjsr305=strict")
@@ -84,6 +90,12 @@ configureByLabels("kotlin") {
         annotation("javax.persistence.Entity")
         annotation("javax.persistence.MappedSuperclass")
         annotation("javax.persistence.Embeddable")
+    }
+
+    noArg {
+        annotation("javax.persistence.Entity")
+        annotation("jakarta.persistence.Entity")
+        annotation("javax.persistence.MappedSuperclass")
     }
 }
 
