@@ -3,11 +3,11 @@ import com.linecorp.support.project.multi.recipe.configureByLabels
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
+    kotlin("plugin.jpa") version "1.9.25"
+    kotlin("kapt") version "1.8.22"
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
-    kotlin("plugin.jpa") version "1.9.25"
     id("com.linecorp.build-recipe-plugin") version "1.1.1"
-    kotlin("kapt") version "1.8.22"
     id("com.palantir.docker") version "0.36.0"
 }
 
@@ -37,6 +37,7 @@ configureByLabels("kotlin") {
 
     dependencies {
         implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+        implementation(rootProject.libs.auth0.jwt)
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -50,14 +51,6 @@ configureByLabels("kotlin") {
             mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.5")
             mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.3")
             mavenBom("com.google.guava:guava-bom:31.1-jre")
-        }
-
-        dependencies {
-            dependencySet("io.jsonwebtoken:0.12.6") {
-                entry("jjwt-api")
-                entry("jjwt-impl")
-                entry("jjwt-jackson")
-            }
         }
     }
 
