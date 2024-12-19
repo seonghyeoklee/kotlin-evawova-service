@@ -42,3 +42,5 @@ eureka:
 logging:
   file:
     path: ./evawova-infra/logs
+  level:
+    feign: DEBUG

@@ -1,6 +1,7 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 dependencies {
+    implementation(project(":evawova-core:core-domain"))
     implementation(project(":evawova-core:core-usecase"))
     implementation(project(":evawova-commons"))
 

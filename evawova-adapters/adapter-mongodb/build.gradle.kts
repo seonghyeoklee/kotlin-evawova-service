@@ -4,6 +4,4 @@ dependencies {
     implementation(project(":evawova-commons"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-
-    runtimeOnly(project(":evawova-core:core-service"))
 }

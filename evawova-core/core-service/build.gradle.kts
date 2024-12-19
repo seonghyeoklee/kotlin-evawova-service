@@ -1,4 +1,5 @@
 dependencies {
+    implementation(project(":evawova-adapters:adapter-http"))
     implementation(project(":evawova-core:core-usecase"))
     implementation(project(":evawova-core:core-port"))
     implementation(project(":evawova-core:core-domain"))
