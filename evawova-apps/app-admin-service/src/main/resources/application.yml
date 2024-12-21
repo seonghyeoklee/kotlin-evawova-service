@@ -5,10 +5,10 @@ server:
 spring:
   config:
     import:
-      - 'classpath:adapter-kafka-property.yml'
-      - 'classpath:adapter-mongodb-property.yml'
+#      - 'classpath:adapter-kafka-property.yml'
+#      - 'classpath:adapter-mongodb-property.yml'
       - 'classpath:adapter-persistence-property.yml'
-      - 'classpath:adapter-redis-property.yml'
+#      - 'classpath:adapter-redis-property.yml'
   application:
     name: evawova-app-admin-service
 

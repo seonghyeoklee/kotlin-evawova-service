@@ -10,15 +10,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     implementation(project(":evawova-adapters:adapter-http"))
-    implementation(project(":evawova-adapters:adapter-kafka"))
-    implementation(project(":evawova-adapters:adapter-mongodb"))
+//    implementation(project(":evawova-adapters:adapter-kafka"))
+//    implementation(project(":evawova-adapters:adapter-mongodb"))
     implementation(project(":evawova-adapters:adapter-persistence"))
-    implementation(project(":evawova-adapters:adapter-redis"))
+//    implementation(project(":evawova-adapters:adapter-redis"))
 }
 
 val appMainClassName = "com.evawova.AdminServiceApplicationKt"

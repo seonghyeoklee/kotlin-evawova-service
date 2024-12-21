@@ -20,7 +20,7 @@ class UpbitMarketController(
     )
     @GetMapping("/upbit/market")
     fun getUpbitMarkets(
-        @Parameter(description = "유의종목 필드과 같은 상세 정보 노출 여부", required = false)
-        @RequestParam(value = "is_details", defaultValue = "false", required = false) isDetails: Boolean,
+        @Parameter(description = "유의종목 필드과 같은 상세 정보 노출 여부", required = true)
+        @RequestParam(value = "is_details", defaultValue = "true", required = true) isDetails: Boolean,
     ): List<MarketResponse> = upbitMarketFetchUsecase.getUpbitMarkets(isDetails)
 }

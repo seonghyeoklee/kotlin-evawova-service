@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration
 @OpenAPIDefinition(
     info =
         Info(
-            title = "My API",
+            title = "Admin API",
             version = "1.0",
             description = "API for managing resources",
         ),
