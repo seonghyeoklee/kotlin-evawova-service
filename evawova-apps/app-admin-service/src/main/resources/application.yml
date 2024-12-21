@@ -40,7 +40,6 @@ eureka:
     registry-fetch-interval-seconds: 10
 
 logging:
-  file:
-    path: ./evawova-infra/logs
   level:
-    feign: DEBUG
+    root: info
+    com.evawova: debug

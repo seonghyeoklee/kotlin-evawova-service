@@ -9,5 +9,5 @@ import org.springframework.stereotype.Service
 class UpbitMarketService(
     private val upbitMarketClient: UpbitMarketClient,
 ) : UpbitMarketFetchUsecase {
-    override fun getUpbitMarkets(): List<MarketResponse> = upbitMarketClient.getMarkets()
+    override fun getUpbitMarkets(isDetails: Boolean): List<MarketResponse> = upbitMarketClient.getUpbitMarkets(isDetails)
 }

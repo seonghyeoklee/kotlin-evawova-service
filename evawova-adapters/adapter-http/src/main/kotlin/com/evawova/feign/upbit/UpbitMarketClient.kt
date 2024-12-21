@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam
 @FeignClient(name = "upbitMarketClient", url = "https://api.upbit.com/v1")
 interface UpbitMarketClient {
     @GetMapping("/market/all")
-    fun getMarkets(
-        @RequestParam("is_details") isDetails: Boolean = true,
+    fun getUpbitMarkets(
+        @RequestParam("is_details") isDetails: Boolean = false,
     ): List<MarketResponse>
 }
