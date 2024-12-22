@@ -7,8 +7,9 @@ import {
     DashboardOutlined,
     UserOutlined,
     SettingOutlined,
-    CodeOutlined,
-    StockOutlined,
+    UnorderedListOutlined,
+    LineChartOutlined,
+    MoneyCollectOutlined
 } from '@ant-design/icons';
 import Link from "next/link";
 
@@ -18,13 +19,18 @@ const {Header, Content, Footer, Sider} = Layout;
 const menuItems = [
     {
         key: '1',
-        icon: <CodeOutlined/>,
+        icon: <LineChartOutlined />,
         label: '시세 종목 조회',
         children: [
             {
                 key: '1-1',
-                icon: <StockOutlined/>,
+                icon: <UnorderedListOutlined />,
                 label: <Link href="/quotation/markets">종목 코드 조회</Link>
+            },
+            {
+                key: '1-2',
+                icon: <MoneyCollectOutlined />,
+                label: <Link href="/quotation/ticker">종목 단위 현재가 정보</Link>
             },
         ],
     },

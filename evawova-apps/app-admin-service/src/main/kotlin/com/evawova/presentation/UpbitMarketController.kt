@@ -1,7 +1,8 @@
 package com.evawova.presentation
 
-import com.evawova.upbit.market.MarketResponse
 import com.evawova.upbit.market.UpbitMarketFetchUsecase
+import com.evawova.upbit.market.UpbitMarketResponse
+import com.evawova.upbit.ticker.UpbitTickerResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,5 +23,15 @@ class UpbitMarketController(
     fun getUpbitMarkets(
         @Parameter(description = "유의종목 필드과 같은 상세 정보 노출 여부", required = true)
         @RequestParam(value = "is_details", defaultValue = "true", required = true) isDetails: Boolean,
-    ): List<MarketResponse> = upbitMarketFetchUsecase.getUpbitMarkets(isDetails)
+    ): List<UpbitMarketResponse> = upbitMarketFetchUsecase.getUpbitMarkets(isDetails)
+
+    @Operation(
+        summary = "업비트 종목 단위 현재가 정보 API",
+        description = "요청 당시 종목의 스냅샷을 반환한다.",
+    )
+    @GetMapping("/upbit/ticker")
+    fun getUpbitTicker(
+        @Parameter(description = "반점으로 구분되는 종목 코드 (ex. KRW-BTC, BTC-ETH)", required = false)
+        @RequestParam(value = "markets", required = false) markets: String?,
+    ): List<UpbitTickerResponse> = upbitMarketFetchUsecase.getUpbitTicker(markets)
 }

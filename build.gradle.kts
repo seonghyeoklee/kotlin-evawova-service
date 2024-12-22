@@ -40,6 +40,10 @@ configureByLabels("kotlin") {
         implementation(rootProject.libs.auth0.jwt)
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
         implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+        implementation("org.springframework.boot:spring-boot-starter-websocket")
+        implementation("org.springframework:spring-websocket:6.0.4")
+        implementation("com.squareup.okhttp3:okhttp:4.11.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service
 class MarketService(
     private val marketFetchPort: MarketFetchPort,
 ) : MarketFetchUsecase {
-    override fun getMarkets(): List<MarketResponse> = marketFetchPort.getMarkets()
+    override fun getMarkets(): List<UpbitMarketResponse> = marketFetchPort.getMarkets()
 }
