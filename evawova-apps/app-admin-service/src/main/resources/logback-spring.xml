@@ -1,6 +1,7 @@
 <configuration>
     <!-- 컬러를 포함한 콘솔 출력 패턴 -->
-    <property name="CONSOLE_PATTERN" value="%cyan(%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}) [%highlight(%-5level)] [%yellow(%thread)] [%magenta(%C)] [%blue(%X{traceId})] - %m%n" />
+    <property name="CONSOLE_PATTERN"
+              value="%cyan(%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}) [%highlight(%-5level)] [%yellow(%thread)] [%magenta(%C)] [%blue(%X{traceId})] [%X{method}-%X{requestUri}] - %m%n"/>
 
     <!-- 콘솔 로그 설정 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -23,7 +24,7 @@
 
     <!-- 루트 로거 설정 -->
     <root level="DEBUG">
-        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="CONSOLE"/>
         <!--        <appender-ref ref="FILE" />-->
     </root>
 </configuration>
