@@ -7,7 +7,9 @@ import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
-import java.util.UUID
+import java.io.EOFException
+import java.net.URI
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
@@ -23,7 +25,17 @@ class UpbitTickerHandler(
         logger.debug { "Client connected: ${session.id}" }
 
         if (sessions.size == 1) {
-            startFetchingData()
+            val uri: URI? = session.uri
+            val queryParams =
+                uri?.query?.split("&")?.associate {
+                    val (key, value) = it.split("=")
+                    key to value
+                }
+
+            val marketsParam = queryParams?.get("markets")
+            val markets = marketsParam?.split(",") ?: emptyList()
+
+            startFetchingData(markets)
         }
     }
 
@@ -39,16 +51,26 @@ class UpbitTickerHandler(
         }
     }
 
+    override fun handleTransportError(
+        session: WebSocketSession,
+        exception: Throwable,
+    ) {
+        if (exception is EOFException) {
+            logger.debug { "Connection closed unexpectedly, attempting reconnect..." }
+            session.close()
+        }
+    }
+
     private fun stopFetchingTickerData() {
         upbitWebSocket?.close(1000, "Client disconnected")
         upbitWebSocket = null
     }
 
-    private fun startFetchingData() {
+    private fun startFetchingData(markets: List<String>) {
         val requestPayload =
             listOf(
                 mapOf("ticket" to UUID.randomUUID()),
-                mapOf("type" to "ticker", "codes" to listOf("KRW-BTC", "KRW-ETH", "BTC-XRP")),
+                mapOf("type" to "ticker", "codes" to markets),
             )
 
         upbitWebSocket =

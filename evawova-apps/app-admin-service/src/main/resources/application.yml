@@ -38,8 +38,3 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     registry-fetch-interval-seconds: 10
-
-logging:
-  level:
-    root: info
-    com.evawova: debug

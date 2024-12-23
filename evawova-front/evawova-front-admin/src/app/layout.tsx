@@ -12,6 +12,7 @@ import {
     MoneyCollectOutlined
 } from '@ant-design/icons';
 import Link from "next/link";
+import { MarketsProvider } from './MarketsContext';
 
 const {Header, Content, Footer, Sider} = Layout;
 
@@ -52,48 +53,50 @@ const menuItems = [
 ];
 
 const RootLayout = ({children}: React.PropsWithChildren) => (
-    <html lang="en">
-    <body style={{height: '100%', margin: 0, overflow: 'hidden'}}>
-    <AntdRegistry>
-        <Layout style={{minHeight: '100vh'}}>
-            {/* 사이드바 */}
-            <Sider collapsible width={250}>
-                <div
-                    style={{
-                        height: 32,
-                        margin: 16,
-                        background: 'rgba(255, 255, 255, 0.3)',
-                        textAlign: 'center',
-                        lineHeight: '32px',
-                        color: 'white',
-                    }}
-                >
-                    DECO
-                </div>
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={menuItems}/>
-            </Sider>
+    <MarketsProvider>
+        <html lang="en">
+            <body style={{height: '100%', margin: 0, overflow: 'hidden'}}>
+                <AntdRegistry>
+                    <Layout style={{minHeight: '100vh'}}>
+                        {/* 사이드바 */}
+                        <Sider collapsible width={250}>
+                            <div
+                                style={{
+                                    height: 32,
+                                    margin: 16,
+                                    background: 'rgba(255, 255, 255, 0.3)',
+                                    textAlign: 'center',
+                                    lineHeight: '32px',
+                                    color: 'white',
+                                }}
+                            >
+                                DECO
+                            </div>
+                            <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={menuItems}/>
+                        </Sider>
 
-            {/* 메인 레이아웃 */}
-            <Layout>
-                {/* 헤더 */}
-                <Header style={{background: '#fff', padding: 0, textAlign: 'center'}}>
-                    <h1 style={{margin: 0}}>Evawova Deco Admin</h1>
-                </Header>
+                        {/* 메인 레이아웃 */}
+                        <Layout>
+                            {/* 헤더 */}
+                            <Header style={{background: '#fff', padding: 0, textAlign: 'center'}}>
+                                <h1 style={{margin: 0}}>Evawova Deco Admin</h1>
+                            </Header>
 
-                {/* 콘텐츠 */}
-                <Content style={{margin: 0, padding: 24, background: '#f0f2f5'}}>
-                    {children}
-                </Content>
+                            {/* 콘텐츠 */}
+                            <Content style={{margin: 0, padding: 24, background: '#f0f2f5'}}>
+                                {children}
+                            </Content>
 
-                {/* 푸터 */}
-                <Footer style={{textAlign: 'center'}}>
-                    Evawova Deco Admin ©2024 Created with Ant Design
-                </Footer>
-            </Layout>
-        </Layout>
-    </AntdRegistry>
-    </body>
-    </html>
+                            {/* 푸터 */}
+                            <Footer style={{textAlign: 'center'}}>
+                                Evawova Deco Admin ©2024 Created with Ant Design
+                            </Footer>
+                        </Layout>
+                    </Layout>
+                </AntdRegistry>
+            </body>
+        </html>
+    </MarketsProvider>
 );
 
 export default RootLayout;
