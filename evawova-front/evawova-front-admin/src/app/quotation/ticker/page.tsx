@@ -51,14 +51,14 @@ export default function UpbitTickerPage() {
         const fetchMarkets = async () => {
             const response = await fetch('http://localhost:8080/api/v1/upbit/market?is_details=false');
             const data: { market: string }[] = await response.json();
-            setMarkets(data.map(value => value.market).slice(0, 50));
+            setMarkets(data.map(value => value.market).slice(0, 70));
         };
 
         if (markets.length === 0) {
             fetchMarkets();
         }
 
-        const ws = new WebSocket(`ws://localhost:8080/ws/upbit?markets=${markets.join(',')}`);
+        const ws = new WebSocket(`ws://localhost:8080/ws/upbit/ticker?markets=${markets.join(',')}`);
         ws.onmessage = (event) => {
             const message: TickerSocketData = JSON.parse(event.data);
             setTickerData((prev) => {
@@ -86,15 +86,17 @@ export default function UpbitTickerPage() {
         const changes: { [key: string]: string } = {};
 
         if (prev.trade_price !== current.trade_price) {
-            changes[`${current.code}-trade_price`] = current.trade_price > prev.trade_price ? 'red' : 'blue';
+            changes[`${current.code}-trade_price`] = current.trade_price > prev.trade_price ? '#DD3D44' : '#1275EC';
         }
+
         if (prev.signed_change_price !== current.signed_change_price) {
             changes[`${current.code}-signed_change_price`] =
-                current.signed_change_price > prev.signed_change_price ? 'red' : 'blue';
+                current.signed_change_price > prev.signed_change_price ? '#DD3D44' : '#1275EC';
         }
+
         if (prev.signed_change_rate !== current.signed_change_rate) {
             changes[`${current.code}-signed_change_rate`] =
-                current.signed_change_rate > prev.signed_change_rate ? 'red' : 'blue';
+                current.signed_change_rate > prev.signed_change_rate ? '#DD3D44' : '#1275EC';
         }
 
         setChangedCells((prevChanges) => ({ ...prevChanges, ...changes }));
@@ -105,20 +107,20 @@ export default function UpbitTickerPage() {
                 Object.keys(changes).forEach((key) => delete updatedChanges[key]);
                 return updatedChanges;
             });
-        }, 1000);
+        }, 500);
     };
 
     const filteredTickerData = tickerData.filter((data) => data.code.startsWith(selectedMarketType));
 
     const columns: ColumnsType<TickerSocketData> = [
         {
-            title: 'Market',
+            title: '종목코드',
             dataIndex: 'code',
             key: 'code',
             render: (code: string) => <strong>{code}</strong>,
         },
         {
-            title: 'Current Price',
+            title: '현재가',
             dataIndex: 'trade_price',
             key: 'trade_price',
             align: 'right',
@@ -139,14 +141,14 @@ export default function UpbitTickerPage() {
             ),
         },
         {
-            title: 'Change (Price)',
+            title: '전일 대비 값',
             dataIndex: 'signed_change_price',
             key: 'signed_change_price',
             align: 'right',
             render: (change: number, record) => (
                 <span
                     style={{
-                        color: change > 0 ? 'red' : change < 0 ? 'blue' : 'gray',
+                        color: change > 0 ? '#DD3D44' : change < 0 ? '#1275EC' : 'gray',
                         border: `2px solid ${changedCells[`${record.code}-signed_change_price`] || 'transparent'}`,
                         padding: '4px',
                         display: 'inline-block',
@@ -161,14 +163,14 @@ export default function UpbitTickerPage() {
             ),
         },
         {
-            title: 'Change (Rate)',
+            title: '전일 대비 등락율',
             dataIndex: 'signed_change_rate',
             key: 'signed_change_rate',
             align: 'right',
             render: (rate: number, record) => (
                 <span
                     style={{
-                        color: rate > 0 ? 'red' : rate < 0 ? 'blue' : 'gray',
+                        color: rate > 0 ? '#DD3D44' : rate < 0 ? '#1275EC' : 'gray',
                         border: `2px solid ${changedCells[`${record.code}-signed_change_rate`] || 'transparent'}`,
                         padding: '4px',
                         display: 'inline-block',
@@ -179,7 +181,7 @@ export default function UpbitTickerPage() {
             ),
         },
         {
-            title: '24h Volume',
+            title: '24시간 누적 거래량',
             dataIndex: 'acc_trade_volume_24h',
             key: 'acc_trade_volume_24h',
             align: 'right',
@@ -247,14 +249,17 @@ export default function UpbitTickerPage() {
                     USDT
                 </button>
             </Space>
-            <Table
-                dataSource={filteredTickerData}
-                columns={columns}
-                pagination={false}
-                rowKey="code"
-                bordered
-                style={{ backgroundColor: '#fff' }}
-            />
+            <section style={{marginBottom: '48px'}}>
+                <Table
+                    dataSource={filteredTickerData}
+                    columns={columns}
+                    pagination={false}
+                    rowKey="code"
+                    bordered
+                    size="small"
+                    style={{ backgroundColor: '#fff' }}
+                />
+            </section>
         </div>
     );
 }

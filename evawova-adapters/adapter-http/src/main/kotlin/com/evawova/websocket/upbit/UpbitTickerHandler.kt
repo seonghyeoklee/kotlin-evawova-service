@@ -1,4 +1,4 @@
-package com.evawova.websocket.ticker
+package com.evawova.websocket.upbit
 
 import mu.KotlinLogging
 import okhttp3.WebSocket
@@ -9,8 +9,9 @@ import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import java.io.EOFException
 import java.net.URI
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 @Component
 class UpbitTickerHandler(
@@ -19,6 +20,8 @@ class UpbitTickerHandler(
     private val logger = KotlinLogging.logger {}
     private val sessions = ConcurrentHashMap.newKeySet<WebSocketSession>()
     private var upbitWebSocket: WebSocket? = null
+    private val reconnectDelayMillis = 1000L
+    private var reconnecting = false
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
         sessions.add(session)
@@ -58,6 +61,52 @@ class UpbitTickerHandler(
         if (exception is EOFException) {
             logger.debug { "Connection closed unexpectedly, attempting reconnect..." }
             session.close()
+            attemptReconnect()
+        }
+    }
+
+    private fun attemptReconnect() {
+        if (reconnecting) {
+            logger.info { "Reconnect attempt already in progress. Skipping duplicate attempt." }
+            return
+        }
+
+        reconnecting = true
+
+        while (true) {
+            try {
+                logger.info { "Waiting ${reconnectDelayMillis / 1000} seconds before reconnecting..." }
+                TimeUnit.MILLISECONDS.sleep(reconnectDelayMillis)
+
+                reconnect()
+                logger.info { "Reconnected successfully." }
+                break
+            } catch (e: Exception) {
+                logger.error(e) { "Reconnect failed. Retrying..." }
+            }
+        }
+
+        reconnecting = false
+    }
+
+    private fun reconnect() {
+        logger.info { "Attempting to reconnect..." }
+
+        val requestPayload =
+            listOf(
+                mapOf("ticket" to UUID.randomUUID().toString()),
+                mapOf("type" to "ticker", "codes" to listOf("KRW-BTC", "KRW-ETH")),
+            )
+
+        try {
+            upbitWebSocket =
+                upbitWebSocketClient.connect(requestPayload) { message ->
+                    broadcast(message)
+                }
+            logger.info { "Reconnected successfully to Upbit WebSocket" }
+        } catch (e: Exception) {
+            logger.error(e) { "Reconnect attempt failed" }
+            throw IllegalStateException("Failed to reconnect to WebSocket")
         }
     }
 

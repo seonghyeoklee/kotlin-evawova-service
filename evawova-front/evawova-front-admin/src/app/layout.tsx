@@ -31,22 +31,32 @@ const menuItems = [
             {
                 key: '1-2',
                 icon: <MoneyCollectOutlined />,
-                label: <Link href="/quotation/ticker">종목 단위 현재가 정보</Link>
+                label: <Link href="/quotation/ticker">현재가 정보</Link>
+            },
+            {
+                key: '1-3',
+                icon: <MoneyCollectOutlined />,
+                label: <Link href="/quotation/orderbook">호가 정보</Link>
             },
         ],
     },
     {
         key: '2',
+        icon: <LineChartOutlined />,
+        label: <Link href="/exchange">거래소</Link>,
+    },
+    {
+        key: '3',
         icon: <DashboardOutlined/>,
         label: <Link href="/dashboard">통계</Link>,
     },
     {
-        key: '3',
+        key: '4',
         icon: <UserOutlined/>,
         label: <Link href="/users">사용자</Link>,
     },
     {
-        key: '4',
+        key: '5',
         icon: <SettingOutlined/>,
         label: <Link href="/settings">설정</Link>,
     },
