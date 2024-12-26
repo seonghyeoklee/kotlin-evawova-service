@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Table, Typography, Card } from 'antd';
-import {ColumnsType} from "antd/es/table";
+import { ColumnsType } from 'antd/es/table';
 
 const { Title } = Typography;
 
@@ -42,22 +42,23 @@ export default function OrderbookPage() {
     // 매도 테이블 컬럼
     const askColumns: ColumnsType<OrderbookData> = [
         {
-            title: '매도잔량',
+            title: '잔량',
             dataIndex: 'ask_size',
             key: 'ask_size',
             align: 'right',
             render: (size: number) => <span>{size.toFixed(3)}</span>,
+            width: '33%',
         },
         {
-            title: '매도호가',
+            title: '가격',
             dataIndex: 'ask_price',
             key: 'ask_price',
             align: 'right',
             render: (price: number) => (
                 <span
                     style={{
-                        backgroundColor: '#1275EC', // 매도호가 배경색
-                        color: '#FFFFFF', // 글씨 색상
+                        backgroundColor: '#1275EC',
+                        color: '#FFFFFF',
                         padding: '4px 8px',
                         display: 'inline-block',
                         borderRadius: '4px',
@@ -66,49 +67,38 @@ export default function OrderbookPage() {
                     {price.toLocaleString()} 원
                 </span>
             ),
+            width: '33%',
         },
         {
-            title: '매수호가',
-            dataIndex: 'bid_price',
-            key: 'bid_price',
+            title: '누적',
+            dataIndex: 'cumulative_size',
+            key: 'cumulative_size',
             align: 'right',
-            render: () => null, // 매도 테이블에서는 매수호가 비워둠
-        },
-        {
-            title: '매수잔량',
-            dataIndex: 'bid_size',
-            key: 'bid_size',
-            align: 'right',
-            render: () => null, // 매도 테이블에서는 매수잔량 비워둠
+            render: (size: number) => <span></span>,
+            width: '33%',
         },
     ];
 
     // 매수 테이블 컬럼
     const bidColumns: ColumnsType<OrderbookData> = [
         {
-            title: '매도잔량',
-            dataIndex: 'ask_size',
-            key: 'ask_size',
+            title: '잔량',
+            dataIndex: 'bid_size',
+            key: 'bid_size',
             align: 'right',
-            render: () => null, // 매수 테이블에서는 매도잔량 비워둠
+            render: (size: number) => <span></span>,
+            width: '33%',
         },
         {
-            title: '매도호가',
-            dataIndex: 'ask_price',
-            key: 'ask_price',
-            align: 'right',
-            render: () => null, // 매수 테이블에서는 매도호가 비워둠
-        },
-        {
-            title: '매수호가',
+            title: '가격',
             dataIndex: 'bid_price',
             key: 'bid_price',
             align: 'right',
             render: (price: number) => (
                 <span
                     style={{
-                        backgroundColor: '#DD3D44', // 매수호가 배경색
-                        color: '#FFFFFF', // 글씨 색상
+                        backgroundColor: '#DD3D44',
+                        color: '#FFFFFF',
                         padding: '4px 8px',
                         display: 'inline-block',
                         borderRadius: '4px',
@@ -117,13 +107,15 @@ export default function OrderbookPage() {
                     {price.toLocaleString()} 원
                 </span>
             ),
+            width: '33%',
         },
         {
-            title: '매수잔량',
-            dataIndex: 'bid_size',
-            key: 'bid_size',
+            title: '누적',
+            dataIndex: 'cumulative_size',
+            key: 'cumulative_size',
             align: 'right',
             render: (size: number) => <span>{size.toFixed(3)}</span>,
+            width: '33%',
         },
     ];
 
@@ -134,20 +126,18 @@ export default function OrderbookPage() {
                 key: index,
                 ask_size: unit.ask_size,
                 ask_price: unit.ask_price,
-                bid_price: null,
-                bid_size: null,
+                cumulative_size: unit.ask_size, // 누적 크기 (데모용)
             }))
-            .sort((a, b) => b.ask_price - a.ask_price) || []; // 높은 가격순 정렬
+            .sort((a, b) => b.ask_price - a.ask_price) || [];
 
     // 매수 데이터: 낮은 가격순 정렬 (기본)
     const bidData =
         orderbook?.orderbook_units
             .map((unit, index) => ({
                 key: index,
-                ask_size: null,
-                ask_price: null,
-                bid_price: unit.bid_price,
                 bid_size: unit.bid_size,
+                bid_price: unit.bid_price,
+                cumulative_size: unit.bid_size, // 누적 크기 (데모용)
             })) || [];
 
     return (
@@ -159,8 +149,8 @@ export default function OrderbookPage() {
                 overflow: 'auto',
             }}
         >
-            <Card style={{marginBottom: '16px'}}>
-                <Title level={4} style={{marginBottom: '0'}}>
+            <Card style={{ marginBottom: '16px' }}>
+                <Title level={4} style={{ marginBottom: '0' }}>
                     호가 정보
                 </Title>
                 {orderbook ? (
@@ -177,29 +167,30 @@ export default function OrderbookPage() {
             {/* 매도 테이블 */}
             <Table
                 title={() => (
-                    <Title level={5} style={{textAlign: 'center', margin: 0}}>
-                        매도호가
+                    <Title level={5} style={{ textAlign: 'center', margin: 0 }}>
+                        일반호가
                     </Title>
                 )}
                 dataSource={askData}
                 columns={askColumns}
                 pagination={false}
                 bordered
-                style={{marginBottom: '24px', backgroundColor: '#fff'}}
+                showHeader={false} // 헤더 숨기기
+                style={{
+                    backgroundColor: '#fff',
+                }}
             />
 
             {/* 매수 테이블 */}
             <Table
-                title={() => (
-                    <Title level={5} style={{textAlign: 'center', margin: 0}}>
-                        매수호가
-                    </Title>
-                )}
                 dataSource={bidData}
                 columns={bidColumns}
                 pagination={false}
                 bordered
-                style={{backgroundColor: '#fff'}}
+                showHeader={false} // 헤더 숨기기
+                style={{
+                    backgroundColor: '#fff',
+                }}
             />
         </div>
     );
