@@ -2,6 +2,7 @@ package com.evawova.presentation
 
 import com.evawova.upbit.candle.UpbitCandleDayResponse
 import com.evawova.upbit.candle.UpbitCandleMinuteResponse
+import com.evawova.upbit.candle.UpbitCandleMonthResponse
 import com.evawova.upbit.candle.UpbitCandleSecondResponse
 import com.evawova.upbit.candle.UpbitCandleWeekResponse
 import com.evawova.upbit.market.UpbitMarketFetchUsecase
@@ -109,4 +110,18 @@ class UpbitMarketController(
         @Parameter(description = "캔들 개수(최대 200개까지 요청 가능)", required = false)
         @RequestParam(value = "count", required = false) count: Int?,
     ): List<UpbitCandleWeekResponse> = upbitMarketFetchUsecase.getUpbitCandlesWeeks(market, to, count)
+
+    @Operation(
+        summary = "업비트 월봉 데이터 조회 API",
+        description = "업비트의 월봉 데이터를 조회합니다.",
+    )
+    @GetMapping("/upbit/candles/months")
+    fun getUpbitCandlesMonths(
+        @Parameter(description = "마켓 코드 (ex. KRW-BTC)", required = true)
+        @RequestParam(value = "market", required = true) market: String,
+        @Parameter(description = "마지막 캔들 시각 (exclusive)", required = false)
+        @RequestParam(value = "to", required = false) to: String?,
+        @Parameter(description = "캔들 개수(최대 200개까지 요청 가능)", required = false)
+        @RequestParam(value = "count", required = false) count: Int?,
+    ): List<UpbitCandleMonthResponse> = upbitMarketFetchUsecase.getUpbitCandlesMonths(market, to, count)
 }

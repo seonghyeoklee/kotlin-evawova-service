@@ -3,6 +3,7 @@ package com.evawova.upbit.external
 import com.evawova.feign.upbit.UpbitMarketFeignClient
 import com.evawova.upbit.candle.UpbitCandleDayResponse
 import com.evawova.upbit.candle.UpbitCandleMinuteResponse
+import com.evawova.upbit.candle.UpbitCandleMonthResponse
 import com.evawova.upbit.candle.UpbitCandleSecondResponse
 import com.evawova.upbit.candle.UpbitCandleWeekResponse
 import com.evawova.upbit.market.UpbitMarketFetchUsecase
@@ -49,6 +50,12 @@ class UpbitMarketService(
         to: String?,
         count: Int?,
     ): List<UpbitCandleWeekResponse> = upbitMarketFeignClient.getUpbitCandlesWeeks(market, to, count)
+
+    override fun getUpbitCandlesMonths(
+        market: String,
+        to: String?,
+        count: Int?,
+    ): List<UpbitCandleMonthResponse> = upbitMarketFeignClient.getUpbitCandlesMonths(market, to, count)
 
     private fun resolveMarkets(markets: String?): String =
         if (markets.isNullOrBlank()) {

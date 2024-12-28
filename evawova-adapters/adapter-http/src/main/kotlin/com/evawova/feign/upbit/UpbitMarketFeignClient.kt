@@ -2,6 +2,7 @@ package com.evawova.feign.upbit
 
 import com.evawova.upbit.candle.UpbitCandleDayResponse
 import com.evawova.upbit.candle.UpbitCandleMinuteResponse
+import com.evawova.upbit.candle.UpbitCandleMonthResponse
 import com.evawova.upbit.candle.UpbitCandleSecondResponse
 import com.evawova.upbit.candle.UpbitCandleWeekResponse
 import com.evawova.upbit.market.UpbitMarketResponse
@@ -57,4 +58,11 @@ interface UpbitMarketFeignClient {
         @RequestParam(value = "to", required = false) to: String?,
         @RequestParam(value = "count", required = false) count: Int?,
     ): List<UpbitCandleWeekResponse>
+
+    @GetMapping("/v1/candles/months")
+    fun getUpbitCandlesMonths(
+        @RequestParam(value = "market", required = true) market: String,
+        @RequestParam(value = "to", required = false) to: String?,
+        @RequestParam(value = "count", required = false) count: Int?,
+    ): List<UpbitCandleMonthResponse>
 }
