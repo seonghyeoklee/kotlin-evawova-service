@@ -17,4 +17,9 @@ interface UpbitMarketClient {
     fun getUpbitTicker(
         @RequestParam("markets") markets: String,
     ): List<UpbitTickerResponse>
+
+    @GetMapping("/v1/ticker/all")
+    fun getUpbitTickerAll(
+        @RequestParam("quote_currencies") quoteCurrencies: String,
+    ): List<UpbitTickerResponse>
 }

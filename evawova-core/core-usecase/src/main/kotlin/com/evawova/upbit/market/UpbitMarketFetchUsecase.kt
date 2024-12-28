@@ -6,4 +6,6 @@ interface UpbitMarketFetchUsecase {
     fun getUpbitMarkets(isDetails: Boolean): List<UpbitMarketResponse>
 
     fun getUpbitTicker(markets: String?): List<UpbitTickerResponse>
+
+    fun getUpbitTickerAll(quoteCurrencies: String): List<UpbitTickerResponse>
 }

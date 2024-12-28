@@ -34,4 +34,14 @@ class UpbitMarketController(
         @Parameter(description = "반점으로 구분되는 종목 코드 (ex. KRW-BTC, BTC-ETH)", required = false)
         @RequestParam(value = "markets", required = false) markets: String?,
     ): List<UpbitTickerResponse> = upbitMarketFetchUsecase.getUpbitTicker(markets)
+
+    @Operation(
+        summary = "업비트 마켓 단위 현재가 정보 API",
+        description = "마켓 단위 종목들의 스냅샷을 반환한다.",
+    )
+    @GetMapping("/upbit/ticker/all")
+    fun getUpbitTickerAll(
+        @Parameter(description = "반점으로 구분되는 거래 화폐 코드 (ex. KRW, BTC, USDT)", required = true)
+        @RequestParam(value = "quote_currencies", required = true) quoteCurrencies: String,
+    ): List<UpbitTickerResponse> = upbitMarketFetchUsecase.getUpbitTickerAll(quoteCurrencies)
 }

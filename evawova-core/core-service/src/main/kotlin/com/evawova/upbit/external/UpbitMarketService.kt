@@ -17,6 +17,9 @@ class UpbitMarketService(
         return upbitMarketClient.getUpbitTicker(resolvedMarkets)
     }
 
+    override fun getUpbitTickerAll(quoteCurrencies: String): List<UpbitTickerResponse> =
+        upbitMarketClient.getUpbitTickerAll(quoteCurrencies)
+
     private fun resolveMarkets(markets: String?): String =
         if (markets.isNullOrBlank()) {
             this
