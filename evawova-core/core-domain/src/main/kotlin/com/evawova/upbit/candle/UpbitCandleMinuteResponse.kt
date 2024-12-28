@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "분(Minute) 캔들")
-data class CandleMinuteResponse(
+data class UpbitCandleMinuteResponse(
     @Schema(description = "종목 코드", example = "KRW-BTC")
     @JsonProperty("market")
     val market: String,

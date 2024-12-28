@@ -1,7 +1,8 @@
 package com.evawova.presentation
 
-import com.evawova.upbit.candle.CandleMinuteResponse
-import com.evawova.upbit.candle.CandleSecondResponse
+import com.evawova.upbit.candle.UpbitCandleDayResponse
+import com.evawova.upbit.candle.UpbitCandleMinuteResponse
+import com.evawova.upbit.candle.UpbitCandleSecondResponse
 import com.evawova.upbit.market.UpbitMarketFetchUsecase
 import com.evawova.upbit.market.UpbitMarketResponse
 import com.evawova.upbit.ticker.UpbitTickerResponse
@@ -60,7 +61,7 @@ class UpbitMarketController(
         @RequestParam(value = "to", required = false) to: String?,
         @Parameter(description = "캔들 개수(최대 200개까지 요청 가능)", required = false)
         @RequestParam(value = "count", required = false) count: Int?,
-    ): List<CandleSecondResponse> = upbitMarketFetchUsecase.getUpbitCandlesSeconds(market, to, count)
+    ): List<UpbitCandleSecondResponse> = upbitMarketFetchUsecase.getUpbitCandlesSeconds(market, to, count)
 
     @Operation(
         summary = "업비트 분봉 데이터 조회 API",
@@ -76,5 +77,21 @@ class UpbitMarketController(
         @RequestParam(value = "count", required = false) count: Int?,
         @Parameter(description = "분 단위(1, 3, 5, 10, 15, 30, 60, 240)", required = true)
         @PathVariable(value = "unit") unit: Int,
-    ): List<CandleMinuteResponse> = upbitMarketFetchUsecase.getUpbitCandlesMinutes(market, to, count, unit)
+    ): List<UpbitCandleMinuteResponse> = upbitMarketFetchUsecase.getUpbitCandlesMinutes(market, to, count, unit)
+
+    @Operation(
+        summary = "업비트 일봉 데이터 조회 API",
+        description = "업비트의 일봉 데이터를 조회합니다.",
+    )
+    @GetMapping("/upbit/candles/days")
+    fun getUpbitCandlesDays(
+        @Parameter(description = "마켓 코드 (ex. KRW-BTC)", required = true)
+        @RequestParam(value = "market", required = true) market: String,
+        @Parameter(description = "마지막 캔들 시각 (exclusive)", required = false)
+        @RequestParam(value = "to", required = false) to: String?,
+        @Parameter(description = "캔들 개수(최대 200개까지 요청 가능)", required = false)
+        @RequestParam(value = "count", required = false) count: Int?,
+        @Parameter(description = "종가 환산 화폐 단위 (생략 가능, KRW로 명시할 시 원화 환산 가격을 반환.)", required = false)
+        @RequestParam(value = "converting_price_unit", required = false) convertingPriceUnit: String?,
+    ): List<UpbitCandleDayResponse> = upbitMarketFetchUsecase.getUpbitCandlesDays(market, to, count, convertingPriceUnit)
 }

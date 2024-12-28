@@ -1,7 +1,8 @@
 package com.evawova.feign.upbit
 
-import com.evawova.upbit.candle.CandleMinuteResponse
-import com.evawova.upbit.candle.CandleSecondResponse
+import com.evawova.upbit.candle.UpbitCandleDayResponse
+import com.evawova.upbit.candle.UpbitCandleMinuteResponse
+import com.evawova.upbit.candle.UpbitCandleSecondResponse
 import com.evawova.upbit.market.UpbitMarketResponse
 import com.evawova.upbit.ticker.UpbitTickerResponse
 import org.springframework.cloud.openfeign.FeignClient
@@ -31,7 +32,7 @@ interface UpbitMarketFeignClient {
         @RequestParam(value = "market", required = true) market: String,
         @RequestParam(value = "to", required = false) to: String?,
         @RequestParam(value = "count", required = false) count: Int?,
-    ): List<CandleSecondResponse>
+    ): List<UpbitCandleSecondResponse>
 
     @GetMapping("/v1/candles/minutes/{unit}")
     fun getUpbitCandlesMinutes(
@@ -39,5 +40,13 @@ interface UpbitMarketFeignClient {
         @RequestParam(value = "to", required = false) to: String?,
         @RequestParam(value = "count", required = false) count: Int?,
         @PathVariable(value = "unit") unit: Int,
-    ): List<CandleMinuteResponse>
+    ): List<UpbitCandleMinuteResponse>
+
+    @GetMapping("/v1/candles/days")
+    fun getUpbitCandlesDays(
+        @RequestParam(value = "market", required = true) market: String,
+        @RequestParam(value = "to", required = false) to: String?,
+        @RequestParam(value = "count", required = false) count: Int?,
+        @RequestParam(value = "converting_price_unit", required = false) convertingPriceUnit: String?,
+    ): List<UpbitCandleDayResponse>
 }
