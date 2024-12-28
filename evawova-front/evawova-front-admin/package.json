@@ -14,10 +14,12 @@
     "@ant-design/nextjs-registry": "^1.0.2",
     "@ant-design/plots": "^2.3.2",
     "antd": "^5.22.5",
+    "apexcharts": "^4.3.0",
     "less": "^4.2.1",
     "next": "15.1.2",
     "next-with-less": "^3.0.1",
     "react": "^19.0.0",
+    "react-apexcharts": "^1.7.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
