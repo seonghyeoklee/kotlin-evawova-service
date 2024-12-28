@@ -1,10 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Table, Typography, Card } from 'antd';
-import { ColumnsType } from 'antd/es/table';
-
-const { Title } = Typography;
 
 interface OrderbookUnit {
     ask_price: number;
@@ -23,7 +19,7 @@ interface OrderbookData {
     stream_type: string;
 }
 
-export default function OrderbookPage() {
+export default function OrderbookCustomComponent() {
     const [orderbook, setOrderbook] = useState<OrderbookData | null>(null);
 
     useEffect(() => {
@@ -39,159 +35,152 @@ export default function OrderbookPage() {
         };
     }, []);
 
-    // 매도 테이블 컬럼
-    const askColumns: ColumnsType<OrderbookData> = [
-        {
-            title: '잔량',
-            dataIndex: 'ask_size',
-            key: 'ask_size',
-            align: 'right',
-            render: (size: number) => <span>{size.toFixed(3)}</span>,
-            width: '33%',
-        },
-        {
-            title: '가격',
-            dataIndex: 'ask_price',
-            key: 'ask_price',
-            align: 'right',
-            render: (price: number) => (
-                <span
-                    style={{
-                        backgroundColor: '#1275EC',
-                        color: '#FFFFFF',
-                        padding: '4px 8px',
-                        display: 'inline-block',
-                        borderRadius: '4px',
-                    }}
-                >
-                    {price.toLocaleString()} 원
-                </span>
-            ),
-            width: '33%',
-        },
-        {
-            title: '누적',
-            dataIndex: 'cumulative_size',
-            key: 'cumulative_size',
-            align: 'right',
-            render: (size: number) => <span></span>,
-            width: '33%',
-        },
-    ];
+    if (!orderbook) return <div>Loading...</div>;
 
-    // 매수 테이블 컬럼
-    const bidColumns: ColumnsType<OrderbookData> = [
-        {
-            title: '잔량',
-            dataIndex: 'bid_size',
-            key: 'bid_size',
-            align: 'right',
-            render: (size: number) => <span></span>,
-            width: '33%',
-        },
-        {
-            title: '가격',
-            dataIndex: 'bid_price',
-            key: 'bid_price',
-            align: 'right',
-            render: (price: number) => (
-                <span
-                    style={{
-                        backgroundColor: '#DD3D44',
-                        color: '#FFFFFF',
-                        padding: '4px 8px',
-                        display: 'inline-block',
-                        borderRadius: '4px',
-                    }}
-                >
-                    {price.toLocaleString()} 원
-                </span>
-            ),
-            width: '33%',
-        },
-        {
-            title: '누적',
-            dataIndex: 'cumulative_size',
-            key: 'cumulative_size',
-            align: 'right',
-            render: (size: number) => <span>{size.toFixed(3)}</span>,
-            width: '33%',
-        },
-    ];
-
-    // 매도 데이터: 높은 가격순 정렬
-    const askData =
-        orderbook?.orderbook_units
-            .map((unit, index) => ({
-                key: index,
-                ask_size: unit.ask_size,
-                ask_price: unit.ask_price,
-                cumulative_size: unit.ask_size, // 누적 크기 (데모용)
-            }))
-            .sort((a, b) => b.ask_price - a.ask_price) || [];
-
-    // 매수 데이터: 낮은 가격순 정렬 (기본)
-    const bidData =
-        orderbook?.orderbook_units
-            .map((unit, index) => ({
-                key: index,
-                bid_size: unit.bid_size,
-                bid_price: unit.bid_price,
-                cumulative_size: unit.bid_size, // 누적 크기 (데모용)
-            })) || [];
+    const maxAskSize = Math.max(...orderbook.orderbook_units.map((unit) => unit.ask_size));
+    const maxBidSize = Math.max(...orderbook.orderbook_units.map((unit) => unit.bid_size));
 
     return (
-        <div
-            style={{
-                padding: '24px',
-                fontFamily: 'Arial, sans-serif',
-                height: 'calc(100vh - 48px)',
-                overflow: 'auto',
-            }}
-        >
-            <Card style={{ marginBottom: '16px' }}>
-                <Title level={4} style={{ marginBottom: '0' }}>
-                    호가 정보
-                </Title>
-                {orderbook ? (
-                    <div>
-                        <p>종목 코드: {orderbook.code}</p>
-                        <p>총 매도잔량: {orderbook.total_ask_size.toFixed(3)} BTC</p>
-                        <p>총 매수잔량: {orderbook.total_bid_size.toFixed(3)} BTC</p>
-                    </div>
-                ) : (
-                    <p>Loading...</p>
-                )}
-            </Card>
+        <div style={{ padding: '24px', fontFamily: 'Arial, sans-serif', height: '100vh', overflow: 'auto' }}>
+            {/* 요약 정보 */}
+            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                <h2>KRW-BTC 호가 정보</h2>
+                <p>
+                    <strong>총 매도잔량:</strong>{' '}
+                    <span style={{ color: '#1275EC', fontSize: '18px' }}>
+                        {orderbook.total_ask_size.toFixed(3)} BTC
+                    </span>
+                </p>
+                <p>
+                    <strong>총 매수잔량:</strong>{' '}
+                    <span style={{ color: '#DD3D44', fontSize: '18px' }}>
+                        {orderbook.total_bid_size.toFixed(3)} BTC
+                    </span>
+                </p>
+            </div>
 
-            {/* 매도 테이블 */}
-            <Table
-                title={() => (
-                    <Title level={5} style={{ textAlign: 'center', margin: 0 }}>
-                        일반호가
-                    </Title>
-                )}
-                dataSource={askData}
-                columns={askColumns}
-                pagination={false}
-                bordered
-                showHeader={false} // 헤더 숨기기
-                style={{
-                    backgroundColor: '#fff',
-                }}
-            />
+            {/* 좌우 대칭 UI */}
+            <div style={{ display: 'flex', gap: '16px' }}>
+                {/* 매도 테이블 */}
+                <div style={{ flex: 1 }}>
+                    <h3 style={{ textAlign: 'right', color: '#1275EC', marginBottom: '8px' }}>매도호가</h3>
+                    {orderbook.orderbook_units
+                        .sort((a, b) => b.ask_price - a.ask_price)
+                        .map((unit, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    alignItems: 'center',
+                                    marginBottom: '4px',
+                                }}
+                            >
+                                {/* 가격 */}
+                                <div style={{ width: '30%', textAlign: 'right', marginRight: '8px' }}>
+                                    <span style={{ fontWeight: 'bold' }}>{unit.ask_price.toLocaleString()} 원</span>
+                                </div>
 
-            {/* 매수 테이블 */}
-            <Table
-                dataSource={bidData}
-                columns={bidColumns}
-                pagination={false}
-                bordered
-                showHeader={false} // 헤더 숨기기
-                style={{
-                    backgroundColor: '#fff',
-                }}
-            />
+                                {/* 잔량 막대 */}
+                                <div
+                                    style={{
+                                        width: '70%',
+                                        display: 'flex',
+                                        justifyContent: 'flex-end',
+                                        alignItems: 'center',
+                                        position: 'relative',
+                                    }}
+                                >
+                                    {/* 막대 */}
+                                    <div
+                                        style={{
+                                            width: `${(unit.ask_size / maxAskSize) * 100}%`,
+                                            backgroundColor: '#7AA5E5', // 연한 파란색
+                                            height: '20px',
+                                            borderRadius: '4px',
+                                            opacity: 0.8,
+                                            position: 'relative',
+                                        }}
+                                    ></div>
+
+                                    {/* 텍스트 */}
+                                    <span
+                                        style={{
+                                            position: 'absolute',
+                                            right: '4px',
+                                            zIndex: 1,
+                                            color: '#000000', // 검정색으로 고정
+                                            fontSize: '12px',
+                                            fontWeight: 'bold',
+                                        }}
+                                    >
+                                        {unit.ask_size.toFixed(3)}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                </div>
+
+                {/* 매수 테이블 */}
+                <div style={{ flex: 1 }}>
+                    <h3 style={{ textAlign: 'left', color: '#DD3D44', marginBottom: '8px' }}>매수호가</h3>
+                    {orderbook.orderbook_units
+                        .sort((a, b) => b.bid_price - a.bid_price)
+                        .map((unit, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-start',
+                                    alignItems: 'center',
+                                    marginBottom: '4px',
+                                }}
+                            >
+                                {/* 잔량 막대 */}
+                                <div
+                                    style={{
+                                        width: '70%',
+                                        display: 'flex',
+                                        justifyContent: 'flex-start',
+                                        alignItems: 'center',
+                                        position: 'relative',
+                                    }}
+                                >
+                                    {/* 막대 */}
+                                    <div
+                                        style={{
+                                            width: `${(unit.bid_size / maxBidSize) * 100}%`,
+                                            backgroundColor: '#E57373', // 연한 빨간색
+                                            height: '20px',
+                                            borderRadius: '4px',
+                                            opacity: 0.8,
+                                            position: 'relative',
+                                        }}
+                                    ></div>
+
+                                    {/* 텍스트 */}
+                                    <span
+                                        style={{
+                                            position: 'absolute',
+                                            left: '4px',
+                                            zIndex: 1,
+                                            color: '#000000', // 검정색으로 고정
+                                            fontSize: '12px',
+                                            fontWeight: 'bold',
+                                        }}
+                                    >
+                                        {unit.bid_size.toFixed(3)}
+                                    </span>
+                                </div>
+
+                                {/* 가격 */}
+                                <div style={{ width: '30%', textAlign: 'left', marginLeft: '8px' }}>
+                                    <span style={{ fontWeight: 'bold' }}>{unit.bid_price.toLocaleString()} 원</span>
+                                </div>
+                            </div>
+                        ))}
+                </div>
+            </div>
         </div>
     );
 }

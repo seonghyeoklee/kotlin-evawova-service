@@ -9,7 +9,7 @@ import {
     SettingOutlined,
     UnorderedListOutlined,
     LineChartOutlined,
-    MoneyCollectOutlined
+    MoneyCollectOutlined, SwapOutlined, BarsOutlined, SyncOutlined
 } from '@ant-design/icons';
 import Link from "next/link";
 import { MarketsProvider } from './MarketsContext';
@@ -25,20 +25,25 @@ const menuItems = [
         children: [
             {
                 key: '1-1',
-                icon: <UnorderedListOutlined />,
+                icon: <BarsOutlined />,
                 label: <Link href="/quotation/markets">종목 코드 조회</Link>
             },
             {
                 key: '1-2',
-                icon: <MoneyCollectOutlined />,
+                icon: <LineChartOutlined />,
                 label: <Link href="/quotation/ticker">현재가 정보</Link>
             },
             {
                 key: '1-3',
-                icon: <MoneyCollectOutlined />,
+                icon: <SyncOutlined />,
+                label: <Link href="/quotation/trade">체결 정보</Link>
+            },
+            {
+                key: '1-4',
+                icon: <SwapOutlined />,
                 label: <Link href="/quotation/orderbook">호가 정보</Link>
             },
-        ],
+        ]
     },
     {
         key: '2',
