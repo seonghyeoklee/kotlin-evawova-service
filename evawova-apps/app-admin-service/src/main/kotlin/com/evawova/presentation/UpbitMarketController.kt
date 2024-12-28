@@ -1,11 +1,14 @@
 package com.evawova.presentation
 
+import com.evawova.upbit.candle.CandleMinuteResponse
+import com.evawova.upbit.candle.CandleSecondResponse
 import com.evawova.upbit.market.UpbitMarketFetchUsecase
 import com.evawova.upbit.market.UpbitMarketResponse
 import com.evawova.upbit.ticker.UpbitTickerResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -57,5 +60,21 @@ class UpbitMarketController(
         @RequestParam(value = "to", required = false) to: String?,
         @Parameter(description = "캔들 개수(최대 200개까지 요청 가능)", required = false)
         @RequestParam(value = "count", required = false) count: Int?,
-    ) = upbitMarketFetchUsecase.getUpbitCandlesSeconds(market, to, count)
+    ): List<CandleSecondResponse> = upbitMarketFetchUsecase.getUpbitCandlesSeconds(market, to, count)
+
+    @Operation(
+        summary = "업비트 분봉 데이터 조회 API",
+        description = "업비트의 분봉 데이터를 조회합니다.",
+    )
+    @GetMapping("/upbit/candles/minutes/{unit}")
+    fun getUpbitCandlesMinutes(
+        @Parameter(description = "마켓 코드 (ex. KRW-BTC)", required = true)
+        @RequestParam(value = "market", required = true) market: String,
+        @Parameter(description = "마지막 캔들 시각 (exclusive)", required = false)
+        @RequestParam(value = "to", required = false) to: String?,
+        @Parameter(description = "캔들 개수(최대 200개까지 요청 가능)", required = false)
+        @RequestParam(value = "count", required = false) count: Int?,
+        @Parameter(description = "분 단위(1, 3, 5, 10, 15, 30, 60, 240)", required = true)
+        @PathVariable(value = "unit") unit: Int,
+    ): List<CandleMinuteResponse> = upbitMarketFetchUsecase.getUpbitCandlesMinutes(market, to, count, unit)
 }

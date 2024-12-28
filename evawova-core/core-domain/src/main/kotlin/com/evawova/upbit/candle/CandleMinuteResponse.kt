@@ -3,8 +3,8 @@ package com.evawova.upbit.candle
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "초(Second) 캔들")
-data class CandleSecondResponse(
+@Schema(description = "분(Minute) 캔들")
+data class CandleMinuteResponse(
     @Schema(description = "종목 코드", example = "KRW-BTC")
     @JsonProperty("market")
     val market: String,
@@ -35,4 +35,6 @@ data class CandleSecondResponse(
     @Schema(description = "누적 거래량 (Candle Accumulated Trade Volume)", example = "1500.0")
     @JsonProperty("candle_acc_trade_volume")
     val candleAccTradeVolume: Double,
+    @Schema(description = "분 단위(유닛)", example = "분 단위. 가능한 값 : 1, 3, 5, 15, 10, 30, 60, 240")
+    val unit: Int,
 )
