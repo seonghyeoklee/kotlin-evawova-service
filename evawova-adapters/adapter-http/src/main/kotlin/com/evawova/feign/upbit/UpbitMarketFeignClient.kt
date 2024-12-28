@@ -3,6 +3,7 @@ package com.evawova.feign.upbit
 import com.evawova.upbit.candle.UpbitCandleDayResponse
 import com.evawova.upbit.candle.UpbitCandleMinuteResponse
 import com.evawova.upbit.candle.UpbitCandleSecondResponse
+import com.evawova.upbit.candle.UpbitCandleWeekResponse
 import com.evawova.upbit.market.UpbitMarketResponse
 import com.evawova.upbit.ticker.UpbitTickerResponse
 import org.springframework.cloud.openfeign.FeignClient
@@ -49,4 +50,11 @@ interface UpbitMarketFeignClient {
         @RequestParam(value = "count", required = false) count: Int?,
         @RequestParam(value = "converting_price_unit", required = false) convertingPriceUnit: String?,
     ): List<UpbitCandleDayResponse>
+
+    @GetMapping("/v1/candles/weeks")
+    fun getUpbitCandlesWeeks(
+        @RequestParam(value = "market", required = true) market: String,
+        @RequestParam(value = "to", required = false) to: String?,
+        @RequestParam(value = "count", required = false) count: Int?,
+    ): List<UpbitCandleWeekResponse>
 }

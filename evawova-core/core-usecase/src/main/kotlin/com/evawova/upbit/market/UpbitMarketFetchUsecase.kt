@@ -3,6 +3,7 @@ package com.evawova.upbit.market
 import com.evawova.upbit.candle.UpbitCandleDayResponse
 import com.evawova.upbit.candle.UpbitCandleMinuteResponse
 import com.evawova.upbit.candle.UpbitCandleSecondResponse
+import com.evawova.upbit.candle.UpbitCandleWeekResponse
 import com.evawova.upbit.ticker.UpbitTickerResponse
 
 interface UpbitMarketFetchUsecase {
@@ -31,4 +32,10 @@ interface UpbitMarketFetchUsecase {
         count: Int?,
         convertingPriceUnit: String?,
     ): List<UpbitCandleDayResponse>
+
+    fun getUpbitCandlesWeeks(
+        market: String,
+        to: String?,
+        count: Int?,
+    ): List<UpbitCandleWeekResponse>
 }
