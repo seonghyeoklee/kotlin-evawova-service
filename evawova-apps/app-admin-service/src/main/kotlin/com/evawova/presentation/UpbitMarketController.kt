@@ -44,4 +44,18 @@ class UpbitMarketController(
         @Parameter(description = "반점으로 구분되는 거래 화폐 코드 (ex. KRW, BTC, USDT)", required = true)
         @RequestParam(value = "quote_currencies", required = true) quoteCurrencies: String,
     ): List<UpbitTickerResponse> = upbitMarketFetchUsecase.getUpbitTickerAll(quoteCurrencies)
+
+    @Operation(
+        summary = "업비트 초봉 데이터 조회 API",
+        description = "초봉 API는요청 시점으로부터 최근 3개월 이내의 초봉을 제공합니다. 초봉 API 가 빈 리스트를 반환하거나, 요청한 개수 만큼 반환하지 않는 경우 to파라미터를 확인 해 보세요.",
+    )
+    @GetMapping("/upbit/candles/seconds")
+    fun getUpbitCandlesSeconds(
+        @Parameter(description = "마켓 코드 (ex. KRW-BTC)", required = true)
+        @RequestParam(value = "market", required = true) market: String,
+        @Parameter(description = "마지막 캔들 시각 (exclusive)", required = false)
+        @RequestParam(value = "to", required = false) to: String?,
+        @Parameter(description = "캔들 개수(최대 200개까지 요청 가능)", required = false)
+        @RequestParam(value = "count", required = false) count: Int?,
+    ) = upbitMarketFetchUsecase.getUpbitCandlesSeconds(market, to, count)
 }

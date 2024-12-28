@@ -1,5 +1,6 @@
 package com.evawova.feign.upbit
 
+import com.evawova.upbit.candle.CandleSecondResponse
 import com.evawova.upbit.market.UpbitMarketResponse
 import com.evawova.upbit.ticker.UpbitTickerResponse
 import org.springframework.cloud.openfeign.FeignClient
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 
 @FeignClient(name = "upbitMarketClient", url = "https://api.upbit.com")
-interface UpbitMarketClient {
+interface UpbitMarketFeignClient {
     @GetMapping("/v1/market/all")
     fun getUpbitMarkets(
         @RequestParam("is_details") isDetails: Boolean = false,
@@ -22,4 +23,11 @@ interface UpbitMarketClient {
     fun getUpbitTickerAll(
         @RequestParam("quote_currencies") quoteCurrencies: String,
     ): List<UpbitTickerResponse>
+
+    @GetMapping("/v1/candles/seconds")
+    fun getUpbitCandlesSeconds(
+        @RequestParam(value = "market", required = true) market: String,
+        @RequestParam(value = "to", required = false) to: String?,
+        @RequestParam(value = "count", required = false) count: Int?,
+    ): List<CandleSecondResponse>
 }
