@@ -1,5 +1,15 @@
-package com.evawova.websocket.upbit
+package com.evawova.websocket.upbit.handler
 
+import com.evawova.websocket.exception.InvalidAuthException
+import com.evawova.websocket.exception.InvalidParamException
+import com.evawova.websocket.exception.NoCodesException
+import com.evawova.websocket.exception.NoTicketException
+import com.evawova.websocket.exception.NoTypeException
+import com.evawova.websocket.exception.WebSocketError
+import com.evawova.websocket.exception.WebSocketErrorResponse
+import com.evawova.websocket.exception.WrongFormatException
+import com.evawova.websocket.upbit.UpbitWebSocketClient
+import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import okhttp3.WebSocket
 import org.springframework.stereotype.Component
@@ -14,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 @Component
-class UpbitOrderBookHandler(
+class UpbitTradeHandler(
     private val upbitWebSocketClient: UpbitWebSocketClient,
 ) : TextWebSocketHandler() {
     private val logger = KotlinLogging.logger {}
@@ -25,7 +35,7 @@ class UpbitOrderBookHandler(
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
         sessions.add(session)
-        logger.debug { "OrderBook Client connected: ${session.id}" }
+        logger.debug { "Trade Client connected: ${session.id}" }
 
         if (sessions.size == 1) {
             val uri: URI? = session.uri
@@ -38,7 +48,7 @@ class UpbitOrderBookHandler(
             val marketsParam = queryParams?.get("markets")
             val markets = marketsParam?.split(",") ?: emptyList()
 
-            startFetchingOrderBook(markets)
+            startFetchingTradeData(markets)
         }
     }
 
@@ -47,10 +57,10 @@ class UpbitOrderBookHandler(
         status: CloseStatus,
     ) {
         sessions.remove(session)
-        logger.debug { "OrderBook Client disconnected: ${session.id}" }
+        logger.debug { "Trade Client disconnected: ${session.id}" }
 
         if (sessions.isEmpty()) {
-            stopFetchingOrderBookData()
+            stopFetchingTradeData()
         }
     }
 
@@ -59,15 +69,35 @@ class UpbitOrderBookHandler(
         exception: Throwable,
     ) {
         if (exception is EOFException) {
-            logger.debug { "OrderBook Connection closed unexpectedly, attempting reconnect..." }
+            logger.debug { "Trade Connection closed unexpectedly, attempting reconnect..." }
             session.close()
             attemptReconnect()
+        } else {
+            handleError(session, exception)
         }
+    }
+
+    private fun handleError(
+        session: WebSocketSession,
+        exception: Throwable,
+    ) {
+        val errorResponse =
+            when (exception) {
+                is InvalidAuthException -> WebSocketErrorResponse(WebSocketError("INVALID_AUTH", exception.message!!))
+                is WrongFormatException -> WebSocketErrorResponse(WebSocketError("WRONG_FORMAT", exception.message!!))
+                is NoTicketException -> WebSocketErrorResponse(WebSocketError("NO_TICKET", exception.message!!))
+                is NoTypeException -> WebSocketErrorResponse(WebSocketError("NO_TYPE", exception.message!!))
+                is NoCodesException -> WebSocketErrorResponse(WebSocketError("NO_CODES", exception.message!!))
+                is InvalidParamException -> WebSocketErrorResponse(WebSocketError("INVALID_PARAM", exception.message!!))
+                else -> WebSocketErrorResponse(WebSocketError("UNKNOWN_ERROR", "알 수 없는 오류가 발생했습니다."))
+            }
+        session.sendMessage(TextMessage(ObjectMapper().writeValueAsString(errorResponse)))
+        session.close(CloseStatus.SERVER_ERROR)
     }
 
     private fun attemptReconnect() {
         if (reconnecting) {
-            logger.info { "OrderBook Reconnect attempt already in progress. Skipping duplicate attempt." }
+            logger.info { "Trade Reconnect attempt already in progress. Skipping duplicate attempt." }
             return
         }
 
@@ -79,7 +109,7 @@ class UpbitOrderBookHandler(
                 TimeUnit.MILLISECONDS.sleep(reconnectDelayMillis)
 
                 reconnect()
-                logger.info { "Reconnected successfully to OrderBook WebSocket." }
+                logger.info { "Reconnected successfully to Trade WebSocket." }
                 break
             } catch (e: Exception) {
                 logger.error(e) { "Reconnect failed. Retrying..." }
@@ -90,12 +120,12 @@ class UpbitOrderBookHandler(
     }
 
     private fun reconnect() {
-        logger.info { "Attempting to reconnect to OrderBook WebSocket..." }
+        logger.info { "Attempting to reconnect to Trade WebSocket..." }
 
         val requestPayload =
             listOf(
                 mapOf("ticket" to UUID.randomUUID().toString()),
-                mapOf("type" to "orderbook", "codes" to listOf("KRW-BTC", "KRW-ETH")),
+                mapOf("type" to "trade", "codes" to listOf("KRW-BTC", "KRW-ETH")),
             )
 
         try {
@@ -103,23 +133,23 @@ class UpbitOrderBookHandler(
                 upbitWebSocketClient.connect(requestPayload) { message ->
                     broadcast(message)
                 }
-            logger.info { "Reconnected successfully to OrderBook WebSocket." }
+            logger.info { "Reconnected successfully to Trade WebSocket." }
         } catch (e: Exception) {
             logger.error(e) { "Reconnect attempt failed" }
-            throw IllegalStateException("Failed to reconnect to OrderBook WebSocket")
+            throw IllegalStateException("Failed to reconnect to Trade WebSocket")
         }
     }
 
-    private fun stopFetchingOrderBookData() {
-        upbitWebSocket?.close(1000, "OrderBook Client disconnected")
+    private fun stopFetchingTradeData() {
+        upbitWebSocket?.close(1000, "Trade Client disconnected")
         upbitWebSocket = null
     }
 
-    private fun startFetchingOrderBook(markets: List<String>) {
+    private fun startFetchingTradeData(markets: List<String>) {
         val requestPayload =
             listOf(
                 mapOf("ticket" to UUID.randomUUID()),
-                mapOf("type" to "orderbook", "codes" to markets),
+                mapOf("type" to "trade", "codes" to markets),
             )
 
         upbitWebSocket =
@@ -131,7 +161,7 @@ class UpbitOrderBookHandler(
     private fun broadcast(message: String) {
         sessions.forEach { session ->
             if (session.isOpen) {
-                logger.debug { "Sending OrderBook message to session ${session.id}" }
+                logger.debug { "Sending Trade message to session ${session.id}" }
                 session.sendMessage(TextMessage(message))
             }
         }

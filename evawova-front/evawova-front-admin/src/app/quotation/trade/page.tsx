@@ -45,8 +45,6 @@ export default function TradePage() {
         };
     }, []);
 
-    if (!trades.length) return <div>Loading...</div>;
-
     const columns: ColumnsType<TradeData> = [
         {
             title: '시간',

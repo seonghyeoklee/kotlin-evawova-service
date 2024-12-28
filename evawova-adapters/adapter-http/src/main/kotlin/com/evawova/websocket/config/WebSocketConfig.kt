@@ -1,8 +1,8 @@
 package com.evawova.websocket.config
 
-import com.evawova.websocket.upbit.UpbitOrderBookHandler
-import com.evawova.websocket.upbit.UpbitTickerHandler
-import com.evawova.websocket.upbit.UpbitTradeHandler
+import com.evawova.websocket.upbit.handler.UpbitOrderBookHandler
+import com.evawova.websocket.upbit.handler.UpbitTickerHandler
+import com.evawova.websocket.upbit.handler.UpbitTradeHandler
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.socket.config.annotation.EnableWebSocket
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer

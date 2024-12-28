@@ -1,5 +1,15 @@
-package com.evawova.websocket.upbit
+package com.evawova.websocket.upbit.handler
 
+import com.evawova.websocket.exception.InvalidAuthException
+import com.evawova.websocket.exception.InvalidParamException
+import com.evawova.websocket.exception.NoCodesException
+import com.evawova.websocket.exception.NoTicketException
+import com.evawova.websocket.exception.NoTypeException
+import com.evawova.websocket.exception.WebSocketError
+import com.evawova.websocket.exception.WebSocketErrorResponse
+import com.evawova.websocket.exception.WrongFormatException
+import com.evawova.websocket.upbit.UpbitWebSocketClient
+import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import okhttp3.WebSocket
 import org.springframework.stereotype.Component
@@ -62,7 +72,27 @@ class UpbitTickerHandler(
             logger.debug { "Connection closed unexpectedly, attempting reconnect..." }
             session.close()
             attemptReconnect()
+        } else {
+            handleError(session, exception)
         }
+    }
+
+    private fun handleError(
+        session: WebSocketSession,
+        exception: Throwable,
+    ) {
+        val errorResponse =
+            when (exception) {
+                is InvalidAuthException -> WebSocketErrorResponse(WebSocketError("INVALID_AUTH", exception.message!!))
+                is WrongFormatException -> WebSocketErrorResponse(WebSocketError("WRONG_FORMAT", exception.message!!))
+                is NoTicketException -> WebSocketErrorResponse(WebSocketError("NO_TICKET", exception.message!!))
+                is NoTypeException -> WebSocketErrorResponse(WebSocketError("NO_TYPE", exception.message!!))
+                is NoCodesException -> WebSocketErrorResponse(WebSocketError("NO_CODES", exception.message!!))
+                is InvalidParamException -> WebSocketErrorResponse(WebSocketError("INVALID_PARAM", exception.message!!))
+                else -> WebSocketErrorResponse(WebSocketError("UNKNOWN_ERROR", "알 수 없는 오류가 발생했습니다."))
+            }
+        session.sendMessage(TextMessage(ObjectMapper().writeValueAsString(errorResponse)))
+        session.close(CloseStatus.SERVER_ERROR)
     }
 
     private fun attemptReconnect() {
