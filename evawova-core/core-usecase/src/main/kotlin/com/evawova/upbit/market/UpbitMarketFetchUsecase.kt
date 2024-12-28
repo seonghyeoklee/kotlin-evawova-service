@@ -5,6 +5,7 @@ import com.evawova.upbit.candle.UpbitCandleMinuteResponse
 import com.evawova.upbit.candle.UpbitCandleMonthResponse
 import com.evawova.upbit.candle.UpbitCandleSecondResponse
 import com.evawova.upbit.candle.UpbitCandleWeekResponse
+import com.evawova.upbit.candle.UpbitCandleYearResponse
 import com.evawova.upbit.ticker.UpbitTickerResponse
 
 interface UpbitMarketFetchUsecase {
@@ -45,4 +46,10 @@ interface UpbitMarketFetchUsecase {
         to: String?,
         count: Int?,
     ): List<UpbitCandleMonthResponse>
+
+    fun getUpbitCandlesYears(
+        market: String,
+        to: String?,
+        count: Int?,
+    ): List<UpbitCandleYearResponse>
 }

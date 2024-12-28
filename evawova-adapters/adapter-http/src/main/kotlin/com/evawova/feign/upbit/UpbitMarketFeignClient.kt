@@ -5,6 +5,7 @@ import com.evawova.upbit.candle.UpbitCandleMinuteResponse
 import com.evawova.upbit.candle.UpbitCandleMonthResponse
 import com.evawova.upbit.candle.UpbitCandleSecondResponse
 import com.evawova.upbit.candle.UpbitCandleWeekResponse
+import com.evawova.upbit.candle.UpbitCandleYearResponse
 import com.evawova.upbit.market.UpbitMarketResponse
 import com.evawova.upbit.ticker.UpbitTickerResponse
 import org.springframework.cloud.openfeign.FeignClient
@@ -65,4 +66,11 @@ interface UpbitMarketFeignClient {
         @RequestParam(value = "to", required = false) to: String?,
         @RequestParam(value = "count", required = false) count: Int?,
     ): List<UpbitCandleMonthResponse>
+
+    @GetMapping("/v1/candles/years")
+    fun getUpbitCandlesYears(
+        @RequestParam(value = "market", required = true) market: String,
+        @RequestParam(value = "to", required = false) to: String?,
+        @RequestParam(value = "count", required = false) count: Int?,
+    ): List<UpbitCandleYearResponse>
 }

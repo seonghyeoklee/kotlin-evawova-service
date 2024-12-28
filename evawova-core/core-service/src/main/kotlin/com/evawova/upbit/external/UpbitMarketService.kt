@@ -6,6 +6,7 @@ import com.evawova.upbit.candle.UpbitCandleMinuteResponse
 import com.evawova.upbit.candle.UpbitCandleMonthResponse
 import com.evawova.upbit.candle.UpbitCandleSecondResponse
 import com.evawova.upbit.candle.UpbitCandleWeekResponse
+import com.evawova.upbit.candle.UpbitCandleYearResponse
 import com.evawova.upbit.market.UpbitMarketFetchUsecase
 import com.evawova.upbit.market.UpbitMarketResponse
 import com.evawova.upbit.ticker.UpbitTickerResponse
@@ -56,6 +57,12 @@ class UpbitMarketService(
         to: String?,
         count: Int?,
     ): List<UpbitCandleMonthResponse> = upbitMarketFeignClient.getUpbitCandlesMonths(market, to, count)
+
+    override fun getUpbitCandlesYears(
+        market: String,
+        to: String?,
+        count: Int?,
+    ): List<UpbitCandleYearResponse> = upbitMarketFeignClient.getUpbitCandlesYears(market, to, count)
 
     private fun resolveMarkets(markets: String?): String =
         if (markets.isNullOrBlank()) {
