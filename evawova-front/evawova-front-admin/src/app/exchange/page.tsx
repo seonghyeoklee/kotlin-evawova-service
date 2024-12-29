@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Select, Spin } from 'antd'; // 로딩 상태를 위한 Spin 추가
-import { ApexOptions } from 'apexcharts'; // ApexOptions 타입 추가
+import { Select, Spin } from 'antd';
+import { ApexOptions } from 'apexcharts';
 
 const { Option } = Select;
 
@@ -16,7 +16,8 @@ interface CandleData {
     high_price: number;
     low_price: number;
     trade_price: number;
-    timestamp: number;
+    candle_acc_trade_price: number;
+    candle_acc_trade_volume: number;
 }
 
 const timeUnits = [
@@ -25,31 +26,23 @@ const timeUnits = [
     { label: '일', value: 'days' },
     { label: '주', value: 'weeks' },
     { label: '월', value: 'months' },
-    { label: '년', value: 'years' },
+    { label: '연', value: 'years' },
 ];
 
-export default function CandleChartPage() {
+export default function EnhancedCandleChartPage() {
     const [candles, setCandles] = useState<CandleData[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [timeUnit, setTimeUnit] = useState('minutes');
     const [market] = useState('KRW-BTC');
-    const [error, setError] = useState<string | null>(null); // 에러 메시지 추가
 
     const fetchCandles = async (unit: string) => {
         try {
             setIsLoading(true);
-            setError(null); // 에러 초기화
             const response = await fetch(`http://localhost:8080/api/v1/upbit/candles/${unit}?market=${market}&count=200`);
             const data = await response.json();
-
-            if (Array.isArray(data)) {
-                setCandles(data);
-            } else {
-                throw new Error('Unexpected API response format');
-            }
+            setCandles(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Failed to fetch candle data:', error);
-            setError('데이터를 가져오는 데 실패했습니다. 다시 시도해주세요.');
         } finally {
             setIsLoading(false);
         }
@@ -57,17 +50,48 @@ export default function CandleChartPage() {
 
     useEffect(() => {
         fetchCandles(timeUnit);
+
+        const intervalId = setInterval(() => {
+            fetchCandles(timeUnit);
+        }, 500000);
+
+        return () => clearInterval(intervalId);
     }, [timeUnit]);
+
+    if (isLoading || candles.length === 0) {
+        return (
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100vh',
+                    backgroundColor: '#f8f9fa',
+                }}
+            >
+                <Spin size="large" />
+            </div>
+        );
+    }
 
     const chartData = candles.map((candle) => ({
         x: candle.candle_date_time_kst,
         y: [candle.opening_price, candle.high_price, candle.low_price, candle.trade_price],
     }));
 
+    const volumeData = candles.map((candle) => ({
+        x: candle.candle_date_time_kst,
+        y: candle.candle_acc_trade_volume,
+    }));
+
+    const supportLevel = Math.min(...candles.map((candle) => candle.low_price));
+    const resistanceLevel = Math.max(...candles.map((candle) => candle.high_price));
+
     const options: ApexOptions = {
         chart: {
             type: 'candlestick',
             height: 350,
+            toolbar: { show: true },
         },
         title: {
             text: `${market} (${timeUnits.find((unit) => unit.value === timeUnit)?.label}) 캔들 차트`,
@@ -77,48 +101,21 @@ export default function CandleChartPage() {
             type: 'datetime',
             labels: {
                 rotate: -45,
-                style: {
-                    fontSize: '10px',
-                },
-                formatter: (value) => {
-                    const date = new Date(value);
-                    const days = ['일', '월', '화', '수', '목', '금', '토']; // 요일 배열
-                    const year = date.getFullYear();
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const day = date.getDate().toString().padStart(2, '0');
-                    const hours = date.getHours().toString().padStart(2, '0');
-                    const minutes = date.getMinutes().toString().padStart(2, '0');
-                    const dayOfWeek = days[date.getDay()]; // 요일 추출
-
-                    return `${year}-${month}-${day} ${hours}:${minutes} (${dayOfWeek})`;
-                },
+                style: { fontSize: '10px', colors: '#000' },
             },
-            tickAmount: 10,
         },
         yaxis: {
+            tooltip: { enabled: true },
             labels: {
-                formatter: (value: number) =>
-                    `${value.toLocaleString('ko-KR', {
-                        maximumFractionDigits: 0,
-                    })} 원`,
-            },
-            tooltip: {
-                enabled: true,
+                style: { fontSize: '10px', colors: '#000' },
+                formatter: (value: number) => `${value.toLocaleString()} 원`,
             },
         },
         tooltip: {
             shared: true,
             custom: ({ series, seriesIndex, dataPointIndex, w }) => {
-                const dataPoint = w.config.series[seriesIndex]?.data?.[dataPointIndex];
-
-                if (!dataPoint || !Array.isArray(dataPoint.y)) {
-                    return `
-                        <div style="padding: 10px; border-radius: 4px; background-color: #fff; color: #000;">
-                            <strong>데이터 없음</strong>
-                        </div>
-                    `;
-                }
-                // `dataPoint.y`는 배열 [open, high, low, close]
+                const dataPoint = w.config.series[seriesIndex]?.data[dataPointIndex];
+                if (!dataPoint || !Array.isArray(dataPoint.y)) return '데이터 없음';
                 const [open, high, low, close] = dataPoint.y;
 
                 const date = new Date(dataPoint.x);
@@ -151,43 +148,68 @@ export default function CandleChartPage() {
                 },
             },
         },
-        responsive: [
-            {
-                breakpoint: 768,
-                options: {
-                    chart: {
-                        height: 300,
-                    },
-                    xaxis: {
-                        labels: {
-                            rotate: -30,
-                            style: {
-                                fontSize: '8px',
-                            },
-                        },
+        annotations: {
+            yaxis: [
+                {
+                    y: supportLevel,
+                    borderColor: '#00E396',
+                    label: {
+                        text: `지지선: ${supportLevel.toLocaleString()} 원`,
+                        style: { color: '#fff', background: '#00E396' },
                     },
                 },
+                {
+                    y: resistanceLevel,
+                    borderColor: '#FEB019',
+                    label: {
+                        text: `저항선: ${resistanceLevel.toLocaleString()} 원`,
+                        style: { color: '#fff', background: '#FEB019' },
+                    },
+                },
+            ],
+        },
+    };
+
+    const volumeOptions: ApexOptions = {
+        chart: {
+            type: 'bar',
+            height: 150,
+            toolbar: { show: false },
+        },
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                rotate: -45,
+                style: { fontSize: '10px', colors: '#000' },
+                formatter: (value) => {
+                    const date = new Date(value);
+                    return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+                },
             },
-        ],
+            tickAmount: 6, // 라벨 개수를 제한
+        },
+        yaxis: {
+            labels: {
+                style: { fontSize: '10px', colors: '#000' },
+                formatter: (value: number) => `${value.toLocaleString()}`,
+            },
+        },
+        colors: ['#008FFB'],
+        plotOptions: {
+            bar: {
+                columnWidth: '60%',
+            },
+        },
+        dataLabels: {
+            enabled: false, // 데이터 라벨 비활성화
+        },
     };
 
     return (
-        <div
-            style={{
-                padding: '24px',
-                fontFamily: 'Arial, sans-serif',
-                backgroundColor: '#f8f9fa',
-                height: '100vh',
-                overflow: 'auto',
-            }}
-        >
+        <div style={{ padding: '24px', backgroundColor: '#f8f9fa', height: '100vh' }}>
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0 }}>KRW-BTC 캔들 차트</h2>
-                <Select
-                    value={timeUnit}
-                    onChange={(value) => setTimeUnit(value)}
-                    style={{ width: 150 }}
-                >
+                <h2>{market} 캔들 차트</h2>
+                <Select value={timeUnit} onChange={(value) => setTimeUnit(value)} style={{ width: 150 }}>
                     {timeUnits.map((unit) => (
                         <Option key={unit.value} value={unit.value}>
                             {unit.label}
@@ -195,12 +217,8 @@ export default function CandleChartPage() {
                     ))}
                 </Select>
             </div>
-            <Chart
-                options={options}
-                series={[{ data: chartData }]}
-                type="candlestick"
-                height={500}
-            />
+            <Chart options={options} series={[{ data: chartData }]} type="candlestick" height={400} />
+            <Chart options={volumeOptions} series={[{ data: volumeData }]} type="bar" height={150} />
         </div>
     );
 }
