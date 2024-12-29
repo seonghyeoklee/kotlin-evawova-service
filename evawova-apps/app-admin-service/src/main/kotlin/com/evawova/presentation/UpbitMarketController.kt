@@ -1,5 +1,6 @@
 package com.evawova.presentation
 
+import UpbitTradeTickResponse
 import com.evawova.upbit.candle.UpbitCandleDayResponse
 import com.evawova.upbit.candle.UpbitCandleMinuteResponse
 import com.evawova.upbit.candle.UpbitCandleMonthResponse
@@ -12,7 +13,6 @@ import com.evawova.upbit.ticker.UpbitTickerResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -70,7 +70,7 @@ class UpbitMarketController(
         summary = "업비트 분봉 데이터 조회 API",
         description = "업비트의 분봉 데이터를 조회합니다.",
     )
-    @GetMapping("/upbit/candles/minutes/{unit}")
+    @GetMapping("/upbit/candles/minutes")
     fun getUpbitCandlesMinutes(
         @Parameter(description = "마켓 코드 (ex. KRW-BTC)", required = true)
         @RequestParam(value = "market", required = true) market: String,
@@ -78,9 +78,7 @@ class UpbitMarketController(
         @RequestParam(value = "to", required = false) to: String?,
         @Parameter(description = "캔들 개수(최대 200개까지 요청 가능)", required = false)
         @RequestParam(value = "count", required = false) count: Int?,
-        @Parameter(description = "분 단위(1, 3, 5, 10, 15, 30, 60, 240)", required = true)
-        @PathVariable(value = "unit") unit: Int,
-    ): List<UpbitCandleMinuteResponse> = upbitMarketFetchUsecase.getUpbitCandlesMinutes(market, to, count, unit)
+    ): List<UpbitCandleMinuteResponse> = upbitMarketFetchUsecase.getUpbitCandlesMinutes(market, to, count)
 
     @Operation(
         summary = "업비트 일봉 데이터 조회 API",
@@ -139,4 +137,22 @@ class UpbitMarketController(
         @Parameter(description = "캔들 개수(최대 200개까지 요청 가능)", required = false)
         @RequestParam(value = "count", required = false) count: Int?,
     ): List<UpbitCandleYearResponse> = upbitMarketFetchUsecase.getUpbitCandlesYears(market, to, count)
+
+    @Operation(
+        summary = "업비트 체결 데이터 조회 API",
+        description = "업비트의 체결 데이터를 조회합니다.",
+    )
+    @GetMapping("/upbit/trades/ticks")
+    fun getUpbitTradeTicks(
+        @Parameter(description = "마켓 코드 (ex. KRW-BTC)", required = true)
+        @RequestParam(value = "market", required = true) market: String,
+        @Parameter(description = "마지막 체결 시각. 형식 : [HHmmss 또는 HH:mm:ss]. 비워서 요청시 가장 최근 데이터", required = false)
+        @RequestParam(value = "to", required = false) to: String?,
+        @Parameter(description = "체결 개수(최대 200개까지 요청 가능)", required = false)
+        @RequestParam(value = "count", required = false) count: Int?,
+        @Parameter(description = "페이지네이션 커서 (sequential_id)", required = false)
+        @RequestParam(value = "cursor", required = false) cursor: String?,
+        @Parameter(description = "최근 체결 날짜 기준 7일 이내의 이전 데이터 조회 가능. 비워서 요청 시 가장 최근 체결 날짜 반환. (범위: 1 ~ 7))", required = false)
+        @RequestParam(value = "days_ago", required = false) daysAgo: Int?,
+    ): List<UpbitTradeTickResponse> = upbitMarketFetchUsecase.getUpbitTradeTicks(market, to, count, cursor, daysAgo)
 }

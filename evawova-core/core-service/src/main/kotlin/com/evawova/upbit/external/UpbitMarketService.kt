@@ -1,5 +1,6 @@
 package com.evawova.upbit.external
 
+import UpbitTradeTickResponse
 import com.evawova.feign.upbit.UpbitMarketFeignClient
 import com.evawova.upbit.candle.UpbitCandleDayResponse
 import com.evawova.upbit.candle.UpbitCandleMinuteResponse
@@ -63,6 +64,14 @@ class UpbitMarketService(
         to: String?,
         count: Int?,
     ): List<UpbitCandleYearResponse> = upbitMarketFeignClient.getUpbitCandlesYears(market, to, count)
+
+    override fun getUpbitTradeTicks(
+        market: String,
+        to: String?,
+        count: Int?,
+        cursor: String?,
+        daysAgo: Int?,
+    ): List<UpbitTradeTickResponse> = upbitMarketFeignClient.getUpbitTradesTicks(market, to, count, cursor, daysAgo)
 
     private fun resolveMarkets(markets: String?): String =
         if (markets.isNullOrBlank()) {

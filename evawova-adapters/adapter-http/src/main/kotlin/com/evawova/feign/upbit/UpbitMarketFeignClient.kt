@@ -1,5 +1,6 @@
 package com.evawova.feign.upbit
 
+import UpbitTradeTickResponse
 import com.evawova.upbit.candle.UpbitCandleDayResponse
 import com.evawova.upbit.candle.UpbitCandleMinuteResponse
 import com.evawova.upbit.candle.UpbitCandleMonthResponse
@@ -73,4 +74,13 @@ interface UpbitMarketFeignClient {
         @RequestParam(value = "to", required = false) to: String?,
         @RequestParam(value = "count", required = false) count: Int?,
     ): List<UpbitCandleYearResponse>
+
+    @GetMapping("/v1/trades/ticks")
+    fun getUpbitTradesTicks(
+        @RequestParam(value = "market", required = true) market: String,
+        @RequestParam(value = "to", required = false) to: String?,
+        @RequestParam(value = "count", required = false) count: Int?,
+        @RequestParam(value = "cursor", required = false) cursor: String?,
+        @RequestParam(value = "days_ago", required = false) daysAgo: Int?,
+    ): List<UpbitTradeTickResponse>
 }
