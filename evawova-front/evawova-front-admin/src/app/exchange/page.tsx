@@ -74,11 +74,24 @@ export default function EnhancedCandleChartPage() {
         );
     }
 
+    // 캔들 차트 데이터
     const chartData = candles.map((candle) => ({
         x: candle.candle_date_time_kst,
         y: [candle.opening_price, candle.high_price, candle.low_price, candle.trade_price],
     }));
 
+    // 이동평균선 계산
+    const calculateSMA = (period: number) => {
+        return candles.map((_, index, array) => {
+            const periodData = array.slice(Math.max(0, index - period + 1), index + 1); // 현재 데이터 포함
+            const average = periodData.reduce((sum, data) => sum + data.trade_price, 0) / periodData.length; // 길이에 따른 평균
+            return { x: array[index].candle_date_time_kst, y: average };
+        });
+    };
+
+    const SMA20 = calculateSMA(20); // 20일 이동평균선
+
+    // 거래량 데이터
     const volumeData = candles.map((candle) => ({
         x: candle.candle_date_time_kst,
         y: candle.candle_acc_trade_volume,
@@ -86,6 +99,48 @@ export default function EnhancedCandleChartPage() {
 
     const supportLevel = Math.min(...candles.map((candle) => candle.low_price));
     const resistanceLevel = Math.max(...candles.map((candle) => candle.high_price));
+
+    // RSI 계산
+    const calculateRSI = (period: number) => {
+        const rsi: { x: string; y: number | null }[] = [];
+        let emaGain = 0;
+        let emaLoss = 0;
+
+        for (let i = 0; i < candles.length; i++) {
+            if (i === 0) {
+                rsi.push({ x: candles[i].candle_date_time_kst, y: null });
+                continue;
+            }
+
+            const change = candles[i].trade_price - candles[i - 1].trade_price;
+
+            if (i < period) {
+                if (change > 0) emaGain += change;
+                else emaLoss += Math.abs(change);
+                if (i === period - 1) {
+                    emaGain /= period;
+                    emaLoss /= period;
+                }
+                rsi.push({ x: candles[i].candle_date_time_kst, y: null });
+                continue;
+            }
+
+            if (change > 0) {
+                emaGain = (emaGain * (period - 1) + change) / period;
+                emaLoss = (emaLoss * (period - 1)) / period;
+            } else {
+                emaGain = (emaGain * (period - 1)) / period;
+                emaLoss = (emaLoss * (period - 1) + Math.abs(change)) / period;
+            }
+
+            const rs = emaLoss === 0 ? 100 : emaGain / emaLoss;
+            const rsiValue = 100 - 100 / (1 + rs);
+            rsi.push({ x: candles[i].candle_date_time_kst, y: rsiValue });
+        }
+
+        return rsi;
+    };
+    const RSI14 = calculateRSI(14); // 14일 RSI 계산
 
     const options: ApexOptions = {
         chart: {
@@ -102,7 +157,12 @@ export default function EnhancedCandleChartPage() {
             labels: {
                 rotate: -45,
                 style: { fontSize: '10px', colors: '#000' },
+                formatter: (value) => {
+                    const date = new Date(value);
+                    return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+                },
             },
+            tickAmount: 6, // 라벨 개수를 제한
         },
         yaxis: {
             tooltip: { enabled: true },
@@ -205,6 +265,36 @@ export default function EnhancedCandleChartPage() {
         },
     };
 
+    const rsiOptions: ApexOptions = {
+        chart: {
+            type: 'line',
+            height: 150,
+            toolbar: { show: false },
+        },
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                rotate: -45,
+                style: { fontSize: '10px', colors: '#000' },
+                formatter: (value) => {
+                    const date = new Date(value);
+                    return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+                },
+            },
+            tickAmount: 6, // 라벨 개수를 제한
+        },
+        yaxis: {
+            max: 100,
+            min: 0,
+            labels: {
+                style: { fontSize: '10px', colors: '#000' },
+            },
+        },
+        tooltip: {
+            shared: true,
+        },
+    };
+
     return (
         <div style={{ padding: '24px', backgroundColor: '#f8f9fa', height: '100vh' }}>
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -217,7 +307,21 @@ export default function EnhancedCandleChartPage() {
                     ))}
                 </Select>
             </div>
-            <Chart options={options} series={[{ data: chartData }]} type="candlestick" height={400} />
+            <Chart
+                options={options}
+                series={[
+                    { name: 'Candlestick', type: 'candlestick', data: chartData },
+                    { name: '20-Day SMA', type: 'line', data: SMA20 },
+                ]}
+                type="candlestick"
+                height={400}
+            />
+            <Chart
+                options={rsiOptions}
+                series={[{ name: 'RSI', type: 'line', data: RSI14 }]}
+                type="line"
+                height={150}
+            />
             <Chart options={volumeOptions} series={[{ data: volumeData }]} type="bar" height={150} />
         </div>
     );
