@@ -7,9 +7,8 @@ import {
     DashboardOutlined,
     UserOutlined,
     SettingOutlined,
-    UnorderedListOutlined,
     LineChartOutlined,
-    MoneyCollectOutlined, SwapOutlined, BarsOutlined, SyncOutlined
+    SwapOutlined, BarsOutlined, SyncOutlined
 } from '@ant-design/icons';
 import Link from "next/link";
 import { MarketsProvider } from './MarketsContext';

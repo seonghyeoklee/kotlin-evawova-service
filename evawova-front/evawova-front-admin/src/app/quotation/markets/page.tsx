@@ -21,7 +21,7 @@ interface MarketData {
 export default function MarketsPage() {
     const [searchValue, setSearchValue] = useState('');
     const [isComposing, setIsComposing] = useState(false);
-    const { data, filteredData, setFilteredData, loading, error } = useFetchMarkets();
+    const { data, filteredData, setFilteredData, loading } = useFetchMarkets();
 
     const handleSearch = (value: string) => {
         const lowercasedValue = value.toLowerCase();
@@ -109,7 +109,7 @@ export default function MarketsPage() {
                 </span>
             ),
             key: 'caution',
-            render: (_: any, record: MarketData) => {
+            render: (_: unknown, record: MarketData) => {
                 const { caution } = record.market_event;
 
                 const getTagColor = (value: boolean) => (value ? 'red' : 'green');

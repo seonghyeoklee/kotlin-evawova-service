@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Select, Spin } from 'antd';
 import { ApexOptions } from 'apexcharts';
@@ -35,7 +35,8 @@ export default function EnhancedCandleChartPage() {
     const [timeUnit, setTimeUnit] = useState('minutes');
     const [market] = useState('KRW-BTC');
 
-    const fetchCandles = async (unit: string) => {
+// fetchCandles를 useCallback으로 메모이제이션
+    const fetchCandles = useCallback(async (unit: string) => {
         try {
             setIsLoading(true);
             const response = await fetch(`http://localhost:8080/api/v1/upbit/candles/${unit}?market=${market}&count=200`);
@@ -46,17 +47,21 @@ export default function EnhancedCandleChartPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [market]);
 
     useEffect(() => {
+        // Initial fetch
         fetchCandles(timeUnit);
 
+        // Interval for periodic fetch
         const intervalId = setInterval(() => {
             fetchCandles(timeUnit);
         }, 500000);
 
+        // Cleanup interval on unmount or dependency change
         return () => clearInterval(intervalId);
-    }, [timeUnit]);
+    }, [fetchCandles, timeUnit]);
+
 
     if (isLoading || candles.length === 0) {
         return (
@@ -173,7 +178,7 @@ export default function EnhancedCandleChartPage() {
         },
         tooltip: {
             shared: true,
-            custom: ({ series, seriesIndex, dataPointIndex, w }) => {
+            custom: ({ seriesIndex, dataPointIndex, w }) => {
                 const dataPoint = w.config.series[seriesIndex]?.data[dataPointIndex];
                 if (!dataPoint || !Array.isArray(dataPoint.y)) return '데이터 없음';
                 const [open, high, low, close] = dataPoint.y;

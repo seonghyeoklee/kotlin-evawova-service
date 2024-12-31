@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import { Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useMarkets } from '@/app/MarketsContext';
@@ -47,13 +47,13 @@ export default function UpbitTickerPage() {
     const [selectedMarketType, setSelectedMarketType] = useState('KRW');
     const { markets, setMarkets } = useMarkets();
 
-    useEffect(() => {
-        const fetchMarkets = async () => {
-            const response = await fetch('http://localhost:8080/api/v1/upbit/market?is_details=false');
-            const data: { market: string }[] = await response.json();
-            setMarkets(data.map(value => value.market).slice(0, 70));
-        };
+    const fetchMarkets = useCallback(async () => {
+        const response = await fetch('http://localhost:8080/api/v1/upbit/market?is_details=false');
+        const data: { market: string }[] = await response.json();
+        setMarkets(data.map(value => value.market).slice(0, 70));
+    }, [setMarkets]);
 
+    useEffect(() => {
         if (markets.length === 0) {
             fetchMarkets();
         }
@@ -80,7 +80,7 @@ export default function UpbitTickerPage() {
                 console.log('WebSocket connection closed');
             }
         };
-    }, [markets]);
+    }, [fetchMarkets, markets]);
 
     const detectChanges = (prev: TickerSocketData, current: TickerSocketData) => {
         const changes: { [key: string]: string } = {};
