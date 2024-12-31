@@ -1,8 +1,8 @@
-const withLess = require('next-with-less');
-
-module.exports = withLess({
-    reactStrictMode: true,
-    lessLoaderOptions: {
-        javascriptEnabled: true,
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    env: {
+        CUSTOM_VARIABLE: process.env.CUSTOM_VARIABLE || 'default_value',
     },
-});
+};
+
+module.exports = nextConfig;

@@ -21,8 +21,8 @@ allprojects {
     }
 }
 
-java {
-    toolchain {
+kotlin {
+    jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
