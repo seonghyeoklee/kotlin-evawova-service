@@ -21,12 +21,6 @@ allprojects {
     }
 }
 
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
 subprojects {
     apply(plugin = "idea")
 }
@@ -84,6 +78,11 @@ configureByLabels("kotlin") {
     kotlin {
         compilerOptions {
             freeCompilerArgs.addAll("-Xjsr305=strict")
+        }
+
+        jvmToolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+            vendor.set(JvmVendorSpec.AMAZON)
         }
     }
 
