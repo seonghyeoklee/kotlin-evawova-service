@@ -19,13 +19,14 @@ const useFetchMarkets = () => {
     const [filteredData, setFilteredData] = useState<MarketData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     useEffect(() => {
         async function fetchMarkets() {
             setError(null);
 
             try {
-                const response = await fetch('http://localhost:8080/api/v1/upbit/market');
+                const response = await fetch(`${baseUrl}/api/v1/upbit/market`);
                 const jsonData: MarketData[] = await response.json();
                 setData(jsonData);
                 setFilteredData(jsonData);

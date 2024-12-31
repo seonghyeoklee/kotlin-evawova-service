@@ -21,6 +21,12 @@ allprojects {
     }
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 subprojects {
     apply(plugin = "idea")
 }

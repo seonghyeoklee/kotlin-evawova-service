@@ -34,12 +34,13 @@ export default function EnhancedCandleChartPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [timeUnit, setTimeUnit] = useState('minutes');
     const [market] = useState('KRW-BTC');
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-// fetchCandles를 useCallback으로 메모이제이션
+    // fetchCandles를 useCallback으로 메모이제이션
     const fetchCandles = useCallback(async (unit: string) => {
         try {
             setIsLoading(true);
-            const response = await fetch(`http://localhost:8080/api/v1/upbit/candles/${unit}?market=${market}&count=200`);
+            const response = await fetch(`${baseUrl}/api/v1/upbit/candles/${unit}?market=${market}&count=200`);
             const data = await response.json();
             setCandles(Array.isArray(data) ? data : []);
         } catch (error) {

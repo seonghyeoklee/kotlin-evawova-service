@@ -21,9 +21,10 @@ interface OrderbookData {
 
 export default function OrderbookCustomComponent() {
     const [orderbook, setOrderbook] = useState<OrderbookData | null>(null);
+    const baseUrl = process.env.NEXT_PUBLIC_WS_BASE_URL;
 
     useEffect(() => {
-        const ws = new WebSocket('ws://localhost:8080/ws/upbit/orderbook?markets=KRW-BTC');
+        const ws = new WebSocket(`${baseUrl}/ws/upbit/orderbook?markets=KRW-BTC`);
 
         ws.onmessage = (event) => {
             const data: OrderbookData = JSON.parse(event.data);

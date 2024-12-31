@@ -46,9 +46,11 @@ export default function UpbitTickerPage() {
     const [changedCells, setChangedCells] = useState<{ [key: string]: string }>({});
     const [selectedMarketType, setSelectedMarketType] = useState('KRW');
     const { markets, setMarkets } = useMarkets();
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const wsBaseUrl = process.env.NEXT_PUBLIC_WS_BASE_URL;
 
     const fetchMarkets = useCallback(async () => {
-        const response = await fetch('http://localhost:8080/api/v1/upbit/market?is_details=false');
+        const response = await fetch(`${baseUrl}/api/v1/upbit/market?is_details=false`);
         const data: { market: string }[] = await response.json();
         setMarkets(data.map(value => value.market).slice(0, 70));
     }, [setMarkets]);
@@ -58,7 +60,7 @@ export default function UpbitTickerPage() {
             fetchMarkets();
         }
 
-        const ws = new WebSocket(`ws://localhost:8080/ws/upbit/ticker?markets=${markets.join(',')}`);
+        const ws = new WebSocket(`${wsBaseUrl}/ws/upbit/ticker?markets=${markets.join(',')}`);
         ws.onmessage = (event) => {
             const message: TickerSocketData = JSON.parse(event.data);
             setTickerData((prev) => {
