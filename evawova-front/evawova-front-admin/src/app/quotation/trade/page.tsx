@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs'; // 날짜/시간 변환 라이브러리
+import { v4 as uuidv4 } from 'uuid';
+
 
 const { Title } = Typography;
 
@@ -35,8 +37,9 @@ export default function TradePage() {
         const ws = new WebSocket('wss://api.upbit.com/websocket/v1');
 
         ws.onopen = () => {
+            const ticket = uuidv4();
             const request = [
-                { ticket: "test" },
+                { ticket: ticket },
                 {
                     type: "trade",
                     codes: ["KRW-BTC"]
@@ -46,18 +49,16 @@ export default function TradePage() {
             ws.send(JSON.stringify(request));
         };
 
-        ws.onmessage = () => {
-            ws.onmessage = async (event) => {
-                const blob = event.data;
-                if (blob instanceof Blob) {
-                    const text = await blob.text();
-                    const trade: TradeData = JSON.parse(text);
+        ws.onmessage = async (event) => {
+            const blob = event.data;
+            if (blob instanceof Blob) {
+                const text = await blob.text();
+                const trade: TradeData = JSON.parse(text);
 
-                    setTrades((prevTrades) => [trade, ...prevTrades.slice(0, 99)]); // 최신 데이터가 위로 추가
-                } else {
-                    console.error("Unexpected message format:", blob);
-                }
-            };
+                setTrades((prevTrades) => [trade, ...prevTrades.slice(0, 99)]);
+            } else {
+                console.error("Unexpected message format:", blob);
+            }
         };
 
         ws.onerror = (error) => {
@@ -65,7 +66,10 @@ export default function TradePage() {
         };
 
         return () => {
-            ws.close();
+            if (ws) {
+                ws.close();
+                console.log('WebSocket connection closed');
+            }
         };
     }, []);
 

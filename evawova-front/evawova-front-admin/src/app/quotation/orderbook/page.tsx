@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import {v4 as uuidv4} from "uuid";
 
 interface OrderbookUnit {
     ask_price: number;
@@ -26,8 +27,9 @@ export default function OrderbookCustomComponent() {
         const ws = new WebSocket(`wss://api.upbit.com/websocket/v1`);
 
         ws.onopen = () => {
+            const ticket = uuidv4();
             const request = [
-                { "ticket": "test" },
+                { "ticket": ticket },
                 {
                     "type": "orderbook",
                     "codes": ["KRW-BTC"],
@@ -54,7 +56,10 @@ export default function OrderbookCustomComponent() {
         };
 
         return () => {
-            ws.close();
+            if (ws) {
+                ws.close();
+                console.log('WebSocket connection closed');
+            }
         };
     }, []);
 

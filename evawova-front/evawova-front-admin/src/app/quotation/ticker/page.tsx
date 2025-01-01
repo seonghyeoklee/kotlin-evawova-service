@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
+import {v4 as uuidv4} from "uuid";
 
 interface TickerSocketData {
     type: string; // 데이터 타입 (ticker)
@@ -49,8 +50,9 @@ export default function UpbitTickerPage() {
         const ws = new WebSocket('wss://api.upbit.com/websocket/v1');
 
         ws.onopen = () => {
+            const ticket = uuidv4();
             const request = [
-                { ticket: "test" },
+                { ticket: ticket },
                 {
                     type: "ticker",
                     codes: ["KRW-BTC"]
