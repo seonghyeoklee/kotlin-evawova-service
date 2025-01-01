@@ -46,7 +46,7 @@ export default function TradePage() {
             ws.send(JSON.stringify(request));
         };
 
-        ws.onmessage = (event) => {
+        ws.onmessage = () => {
             ws.onmessage = async (event) => {
                 const blob = event.data;
                 if (blob instanceof Blob) {
