@@ -30,15 +30,34 @@ interface TradeData {
 
 export default function TradePage() {
     const [trades, setTrades] = useState<TradeData[]>([]);
-    const baseUrl = process.env.NEXT_PUBLIC_WS_BASE_URL;
 
     useEffect(() => {
-        const ws = new WebSocket(`${baseUrl}/ws/upbit/trade?markets=KRW-BTC`);
+        const ws = new WebSocket('wss://api.upbit.com/websocket/v1');
+
+        ws.onopen = () => {
+            const request = [
+                { ticket: "test" },
+                {
+                    type: "trade",
+                    codes: ["KRW-BTC"]
+                },
+                { format: "DEFAULT" }
+            ];
+            ws.send(JSON.stringify(request));
+        };
 
         ws.onmessage = (event) => {
-            const trade: TradeData = JSON.parse(event.data);
+            ws.onmessage = async (event) => {
+                const blob = event.data;
+                if (blob instanceof Blob) {
+                    const text = await blob.text();
+                    const trade: TradeData = JSON.parse(text);
 
-            setTrades((prevTrades) => [trade, ...prevTrades.slice(0, 99)]); // 최신 데이터가 위로 추가
+                    setTrades((prevTrades) => [trade, ...prevTrades.slice(0, 99)]); // 최신 데이터가 위로 추가
+                } else {
+                    console.error("Unexpected message format:", blob);
+                }
+            };
         };
 
         return () => {

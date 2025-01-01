@@ -9,6 +9,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
     id("com.linecorp.build-recipe-plugin") version "1.1.1"
     id("com.palantir.docker") version "0.36.0"
+    id("com.google.cloud.tools.jib") version "3.4.0"
 }
 
 allprojects {
@@ -34,6 +35,7 @@ configureByLabels("kotlin") {
     apply(plugin = "kotlin-jpa")
     apply(plugin = "kotlin-kapt")
     apply(plugin = "com.palantir.docker")
+    apply(plugin = "com.google.cloud.tools.jib")
 
     dependencies {
         implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")

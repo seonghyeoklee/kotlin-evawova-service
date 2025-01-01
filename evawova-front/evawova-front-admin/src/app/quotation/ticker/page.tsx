@@ -1,9 +1,8 @@
 'use client';
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Space, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { useMarkets } from '@/app/MarketsContext';
 
 interface TickerSocketData {
     type: string; // 데이터 타입 (ticker)
@@ -45,24 +44,33 @@ export default function UpbitTickerPage() {
     const [tickerData, setTickerData] = useState<TickerSocketData[]>([]);
     const [changedCells, setChangedCells] = useState<{ [key: string]: string }>({});
     const [selectedMarketType, setSelectedMarketType] = useState('KRW');
-    const { markets, setMarkets } = useMarkets();
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    const wsBaseUrl = process.env.NEXT_PUBLIC_WS_BASE_URL;
-
-    const fetchMarkets = useCallback(async () => {
-        const response = await fetch(`${baseUrl}/api/v1/upbit/market?is_details=false`);
-        const data: { market: string }[] = await response.json();
-        setMarkets(data.map(value => value.market).slice(0, 70));
-    }, [setMarkets]);
 
     useEffect(() => {
-        if (markets.length === 0) {
-            fetchMarkets();
-        }
+        const ws = new WebSocket('wss://api.upbit.com/websocket/v1');
 
-        const ws = new WebSocket(`${wsBaseUrl}/ws/upbit/ticker?markets=${markets.join(',')}`);
-        ws.onmessage = (event) => {
-            const message: TickerSocketData = JSON.parse(event.data);
+        ws.onopen = () => {
+            const request = [
+                { ticket: "test" },
+                {
+                    type: "ticker",
+                    codes: ["KRW-BTC"]
+                },
+                { format: "DEFAULT" }
+            ];
+            ws.send(JSON.stringify(request));
+        };
+
+        ws.onmessage = async (event) => {
+            const rawData = event.data;
+
+            let message: TickerSocketData;
+            if (rawData instanceof Blob) {
+                const text = await rawData.text();
+                message = JSON.parse(text);
+            } else {
+                message = JSON.parse(rawData as string);
+            }
+
             setTickerData((prev) => {
                 const index = prev.findIndex((item) => item.code === message.code);
                 const updated = [...prev];
@@ -82,7 +90,7 @@ export default function UpbitTickerPage() {
                 console.log('WebSocket connection closed');
             }
         };
-    }, [fetchMarkets, markets]);
+    }, []);
 
     const detectChanges = (prev: TickerSocketData, current: TickerSocketData) => {
         const changes: { [key: string]: string } = {};
