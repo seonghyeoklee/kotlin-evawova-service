@@ -49,6 +49,10 @@ export default function OrderbookCustomComponent() {
             }
         };
 
+        ws.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+
         return () => {
             ws.close();
         };

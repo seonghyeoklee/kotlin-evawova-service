@@ -60,6 +60,10 @@ export default function TradePage() {
             };
         };
 
+        ws.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+
         return () => {
             ws.close();
         };

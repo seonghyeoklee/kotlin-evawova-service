@@ -84,6 +84,10 @@ export default function UpbitTickerPage() {
             });
         };
 
+        ws.onerror = (error) => {
+            console.error("WebSocket error:", error);
+        };
+
         return () => {
             if (ws) {
                 ws.close();
