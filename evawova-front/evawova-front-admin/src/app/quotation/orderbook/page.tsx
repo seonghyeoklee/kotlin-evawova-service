@@ -18,36 +18,41 @@ interface OrderbookData {
     total_bid_size: number;
     orderbook_units: OrderbookUnit[];
     stream_type: string;
+    level: number;
 }
 
 export default function OrderbookCustomComponent() {
     const [orderbook, setOrderbook] = useState<OrderbookData | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket(`wss://api.upbit.com/websocket/v1`);
+        const ws = new WebSocket('wss://api.upbit.com/websocket/v1');
 
         ws.onopen = () => {
+            console.log("WebSocket connected.");
             const ticket = uuidv4();
             const request = [
-                { "ticket": ticket },
+                { ticket },
                 {
-                    "type": "orderbook",
-                    "codes": ["KRW-BTC"],
-                    "level": 10000
+                    type: "orderbook",
+                    codes: ["KRW-BTC"]
                 },
-                { "format": "DEFAULT" }
+                { format: "DEFAULT" }
             ];
             ws.send(JSON.stringify(request));
         };
 
         ws.onmessage = async (event) => {
             const blob = event.data;
-            if (blob instanceof Blob) {
-                const text = await blob.text();
-                const data: OrderbookData = JSON.parse(text);
-                setOrderbook(data);
-            } else {
-                console.error("Unexpected message format:", blob);
+            try {
+                if (blob instanceof Blob) {
+                    const text = await blob.text();
+                    const data: OrderbookData = JSON.parse(text);
+                    setOrderbook(data);
+                } else {
+                    console.error("Unexpected message format:", blob);
+                }
+            } catch (error) {
+                console.error("Error processing WebSocket message:", error);
             }
         };
 
@@ -58,7 +63,7 @@ export default function OrderbookCustomComponent() {
         return () => {
             if (ws) {
                 ws.close();
-                console.log('WebSocket connection closed');
+                console.log("WebSocket disconnected.");
             }
         };
     }, []);

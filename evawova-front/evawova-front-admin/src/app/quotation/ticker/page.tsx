@@ -63,27 +63,27 @@ export default function UpbitTickerPage() {
         };
 
         ws.onmessage = async (event) => {
-            const rawData = event.data;
+            const blob = event.data;
+            if (blob instanceof Blob) {
+                const text = await blob.text();
+                const message: TickerSocketData = JSON.parse(text);
 
-            let message: TickerSocketData;
-            if (rawData instanceof Blob) {
-                const text = await rawData.text();
-                message = JSON.parse(text);
+                setTickerData((prev) => {
+                    const index = prev.findIndex((item) => item.code === message.code);
+                    const updated = [...prev];
+                    if (index !== -1) {
+                        detectChanges(updated[index], message);
+                        updated[index] = message;
+                    } else {
+                        updated.push(message);
+                    }
+                    return updated;
+                });
             } else {
-                message = JSON.parse(rawData as string);
+                console.error("Unexpected message format:", blob);
             }
 
-            setTickerData((prev) => {
-                const index = prev.findIndex((item) => item.code === message.code);
-                const updated = [...prev];
-                if (index !== -1) {
-                    detectChanges(updated[index], message);
-                    updated[index] = message;
-                } else {
-                    updated.push(message);
-                }
-                return updated;
-            });
+
         };
 
         ws.onerror = (error) => {
